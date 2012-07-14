@@ -3,9 +3,11 @@
 
 from __future__ import unicode_literals
 
+import datetime
 import json
 import re
 
+import dateutil.parser, dateutil.tz
 import bottle
 import requests
 
@@ -71,7 +73,12 @@ def go():
 
         # Message Time
         msg_time = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Msg Time"]/following-sibling::*', namespaces=namespaces)[0].text
-        r['msg_time'] = msg_time
+        r['msg_time_raw'] = msg_time
+        # bug here: need to make sure for times the previous night, we're not setting date in the future
+        now = datetime.datetime.now(tz=dateutil.tz.gettz('US/Mountain'))
+        now = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        msg_time = dateutil.parser.parse(msg_time, default=now)
+        r['msg_time'] = msg_time.isoformat()
 
         # Coordinates
         coords = bus_element.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
