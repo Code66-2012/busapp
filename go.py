@@ -14,6 +14,11 @@ import requests
 from bottle import route, debug, response
 from lxml import etree
 
+def utf8_encode_callback(m):
+    return unicode(m).encode()
+
+def fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(s):
+    return re.sub('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', utf8_encode_callback, s)
 
 headers = {'user-agent': 'Code 66 hackathon'}
 namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
@@ -32,12 +37,11 @@ def go():
     stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
     raw_document = d.content
 
-    raw_document = file('tests/intallbuses.kml').read()
+    #raw_document = file('tests/intallbuses.kml').read()
 
-    try:
-        raw_document = raw_document.encode('utf-8')
-    except UnicodeDecodeError:
-        pass
+    raw_document = raw_document.decode('latin1')
+    raw_document = raw_document.encode('utf-8', 'xmlcharrefreplace')
+    raw_document = fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(raw_document)
 
     t = etree.fromstring(raw_document)
 
@@ -60,10 +64,14 @@ def go():
         r['route_id'] = int(route_id)
 
         # Next Stop
-        next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)[0].text
-        next_stop = re.match('(.*) @(.*) scheduled', next_stop)
+        next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)
+        if not next_stop:
+            next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Deadhead"]/following-sibling::*', namespaces=namespaces)
+        next_stop = next_stop[0].text
+        next_stop = re.match('(Next stop is )?(.*) @(.*) scheduled', next_stop)
         if next_stop:
             next_stop = next_stop.groups()
+            next_stop = next_stop[-2:]
             next_stop = [i.strip() for i in next_stop]
         else:
             print next_stop
