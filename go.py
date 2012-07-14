@@ -15,7 +15,7 @@ d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml'
 raw_document = d.content
 print 'raw document length:', len(raw_document)
 
-raw_document = file('intallbuses.kml').read()
+raw_document = file('tests/intallbuses.kml').read()
 
 try:
     raw_document = raw_document.encode('utf-8')
