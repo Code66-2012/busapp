@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import argparse
 import datetime
 import json
+import time
 import re
 
 import dateutil.parser, dateutil.tz
@@ -18,14 +19,20 @@ import re
 import zipfile
 from StringIO import StringIO
 
+
 def utf8_encode_callback(m):
     return unicode(m).encode()
 
 def fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(s):
     return re.sub('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', utf8_encode_callback, s)
 
+
 headers = {'user-agent': 'Code 66 hackathon'}
 namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
+
+# create persistent session, so we don't hammer ABQ's servers too much
+session = requests.session(headers=headers)
+
 
 @route('/')
 @route('/nyan') # backward compatibility, remove this
@@ -34,7 +41,6 @@ def returnJson():
     return json.dumps(go(live()))
 
 def live():
-    session = requests.session(headers=headers)
 
     d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml')
     raw_document = d.content
@@ -151,6 +157,7 @@ def go(raw_document):
         now = now.replace(hour=0, minute=0, second=0, microsecond=0)
         msg_time = dateutil.parser.parse(msg_time, default=now)
         r['msg_time'] = msg_time.isoformat()
+        r['msg_time_epoch'] = time.mktime(msg_time.timetuple())
 
         # Coordinates
         coords = bus_element.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
