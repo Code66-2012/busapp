@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import argparse
 import datetime
 import json
+import time
 import re
 
 import dateutil.parser, dateutil.tz
@@ -91,6 +92,7 @@ def go(raw_document):
         now = now.replace(hour=0, minute=0, second=0, microsecond=0)
         msg_time = dateutil.parser.parse(msg_time, default=now)
         r['msg_time'] = msg_time.isoformat()
+        r['msg_time_epoch'] = time.mktime(msg_time.timetuple())
 
         # Coordinates
         coords = bus_element.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
