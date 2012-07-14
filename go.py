@@ -40,6 +40,7 @@ def go():
 
         # Bus ID
         bus_id = bus_element.xpath('kml:name', namespaces=namespaces)[0].text
+        r['bus_id'] = bus_id
 
         # Route ID
         route_id = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Route"]/following-sibling::*', namespaces=namespaces)
@@ -76,7 +77,6 @@ def go():
         coords_out['lat'] = float(coords[1])
         r['coords'] = coords_out
 
-        r['bus_id'] = bus_id
         bus_elements_output.append(r)
     return json.dumps(bus_elements_output)
 
