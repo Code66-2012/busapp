@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 
 import bottle
-from bottle import route
+from bottle import route, response
 import json
 import requests
 from lxml import etree
@@ -12,8 +12,11 @@ from lxml import etree
 headers = {'user-agent': 'Code 66 hackathon'}
 namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
 
-@route('/nyan')
+@route('/')
+@route('/nyan') # backward compatibility, remove this
 def go():
+    response.content_type = 'application/json'
+
     session = requests.session(headers=headers)
 
     d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml')
