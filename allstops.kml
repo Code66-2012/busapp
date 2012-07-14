@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2">
+<Document id="transitstops">
+  <name>transitstops</name>
+  <Snippet></Snippet>
+  <Folder id="FeatureLayer0">
+    <name>transitstops</name>
+  <Snippet></Snippet>
+    <Placemark>
+      <name>96, 98</name>
+      <styleUrl>#IconStyle00</styleUrl>
+      <Snippet></Snippet>
+      <description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format">
+
+<body leftmargin="0" topmargin="0" bottommargin="0" rightmargin="0">
+
+<font face="Arial">
+
+<table border="1" width="300" cellpadding="5" cellspacing="0">
+
+<tr bgcolor="#9CBCE2">
+
+<th width="50&#37;" align="left">Field Name</th>
+
+<th width="50&#37;" align="left">Field Value</th>
+
+</tr>
+
+<tr>
+
+<td>Stop ID</td>
+
+<td>1066</td>
+
+</tr>
+
+<tr bgcolor="#D4E4F3">
+
+<td>Route</td>
+
+<td>96, 98</td>
+
+</tr>
+
+<tr>
+
+<td>Direction</td>
+
+<td>Layover</td>
+
+</tr>
+
+<tr bgcolor="#D4E4F3">
+
+<td>Bus Position</td>
+
+<td>Parking Lot</td>
+
+</tr>
+
+<tr>
+
+<td>Street</td>
+
+<td>9TH</td>
+
+</tr>
+
+<tr bgcolor="#D4E4F3">
+
+<td>Nearest Intersection</td>
+
+<td>V Avenue (AREA 4)</td>
+
+</tr>
+
+<tr>
+
+<td>Signs</td>
+
+<td>Both</td>
+
+</tr>
+
+<tr bgcolor="#D4E4F3">
+
+<td>Bench</td>
+
+<td>1</td>
+
+</tr>
+
+<tr>
+
+<td>Shelter</td>
+
+<td>0</td>
+
+</tr>
+
+</table>
+
+</font>
+
+</body>
+
+</html>
+
+]]></description>
+      <Point>
+        <extrude>0</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <coordinates> -106.544284,35.034656,0.000000</coordinates>
+      </Point>
+    </Placemark>
+   </Document>
+</kml>
