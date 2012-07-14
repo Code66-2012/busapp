@@ -3,33 +3,47 @@
 
 from __future__ import unicode_literals
 
-import bottle
-from bottle import route, debug, response
+import argparse
+import datetime
 import json
+import re
+
+import dateutil.parser, dateutil.tz
+import bottle
 import requests
+
+from bottle import route, debug, response
 from lxml import etree
 import re
 import zipfile
-from StringIO import StringIO
+
+def utf8_encode_callback(m):
+    return unicode(m).encode()
+
+def fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(s):
+    return re.sub('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', utf8_encode_callback, s)
 
 headers = {'user-agent': 'Code 66 hackathon'}
 namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
 
 @route('/')
 @route('/nyan') # backward compatibility, remove this
-def go():
+def returnJson():
     response.content_type = 'application/json'
+    return json.dumps(go(live()))
 
+def live():
     session = requests.session(headers=headers)
 
     d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml')
     stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
-    #stops = session.get('http://web.localhost/transitstops.kmz')
     raw_document = d.content
     raw_stops = stops
     raw_stops = stops.content
 
-    raw_document = file('tests/intallbuses.kml').read()
+    return raw_document
+
+def go(raw_document):
 
     try:
         raw_document = raw_document.encode('utf-8')
@@ -38,6 +52,10 @@ def go():
         pass
     raw_stops = zipfile.ZipFile(StringIO(raw_stops), 'r')
     raw_stops = raw_stops.open('doc.kml').read()
+
+    raw_document = raw_document.decode('iso-8859-1')
+    raw_document = raw_document.encode('utf-8')
+    #raw_document = fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(raw_document)
 
     raw_stops = raw_stops.replace('http://earth.google.com/kml/2.2', namespaces['kml'])
     t = etree.fromstring(raw_document)
@@ -77,6 +95,7 @@ def go():
 
         # Bus ID
         bus_id = bus_element.xpath('kml:name', namespaces=namespaces)[0].text
+        r['bus_id'] = int(bus_id)
 
         # Route ID
         route_id = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Route"]/following-sibling::*', namespaces=namespaces)
@@ -85,35 +104,72 @@ def go():
         route_id = route_id[0].text
         if route_id == 'Off Duty':
             continue
-        r['route_id'] = route_id
+        r['route_id'] = int(route_id)
 
         # Next Stop
-        next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)[0].text
-        next_stop = re.match('(.*) @(.*) scheduled', next_stop)
+        next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)
+        if not next_stop:
+            next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Deadhead"]/following-sibling::*', namespaces=namespaces)
+        next_stop = next_stop[0].text
+        next_stop = re.match('(Next stop is )?(.*) @(.*) scheduled', next_stop)
         if next_stop:
             next_stop = next_stop.groups()
+            next_stop = next_stop[-2:]
             next_stop = [i.strip() for i in next_stop]
         r['next_stop'] = {'streets':next_stop}
 
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text
         speed = speed.split()[0]
-        r['speed'] = speed
+        r['speed'] = float(speed)
 
+        # Message Time
         msg_time = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Msg Time"]/following-sibling::*', namespaces=namespaces)[0].text
-        r['msg_time'] = msg_time
+        r['msg_time_raw'] = msg_time
+        # bug here: need to make sure for times the previous night, we're not setting date in the future
+        now = datetime.datetime.now(tz=dateutil.tz.gettz('US/Mountain'))
+        now = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        msg_time = dateutil.parser.parse(msg_time, default=now)
+        r['msg_time'] = msg_time.isoformat()
 
-        r['bus_id'] = bus_id
-        r['speed'] = speed
+        # Coordinates
+        coords = bus_element.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
+        coords = coords.split(',')
+        coords_out = {}
+        coords_out['lon'] = float(coords[0])
+        coords_out['lat'] = float(coords[1])
+        r['coords'] = coords_out
+
+        # Heading
+        heading = bus_element.xpath('kml:Style/kml:IconStyle/kml:heading', namespaces=namespaces)[0].text
+        r['heading'] = int(heading)
+
         bus_elements_output.append(r)
-    return json.dumps(bus_elements_output)
+    return bus_elements_output
 
 application = bottle.default_app()
 
 
 if __name__ == '__main__':
-#    import pprint
-#    pprint.pprint(go())
-    from bottle import run
-    debug(True)
-    run(reloader=True)
+    parser = argparse.ArgumentParser(description='Make real-time data about Albuquerque buses less stupid')
+    parser.add_argument('--filename', '-i', help='Offline KML file to parse')
+    parser.add_argument('--live', action='store_true', default=False, help='Fetch live data from ABQdata')
+
+    args = parser.parse_args()
+
+    # fetch data live
+    if args.live:
+        import pprint
+        pprint.pprint(go(live()))
+    # if we've a filename, process it and quit
+    elif args.filename:
+        import pprint
+
+        with open(args.filename) as fp:
+            data = fp.read()
+            pprint.pprint(go(data))
+    # if no filename, start Web server for live querying
+    else:
+        from bottle import run
+        debug(True)
+        run(reloader=True)
