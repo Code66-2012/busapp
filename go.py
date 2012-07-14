@@ -16,7 +16,7 @@ namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
 @route('/')
 @route('/nyan') # backward compatibility, remove this
 def go():
-    #response.content_type = 'application/json'
+    response.content_type = 'application/json'
 
     session = requests.session(headers=headers)
 
@@ -53,8 +53,6 @@ def go():
         # Next Stop
         next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)[0].text
         next_stop = re.match('(.*) @(.*) scheduled', next_stop)
-        import pprint
-        pprint.pprint(next_stop)
         if next_stop:
           next_stop = next_stop.groups()
         else:
