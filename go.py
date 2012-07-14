@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+import argparse
 import datetime
 import json
 import re
@@ -26,22 +27,22 @@ namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
 @route('/')
 @route('/nyan') # backward compatibility, remove this
 def returnJson():
-    return json.dumps(go())
-
-def go():
     response.content_type = 'application/json'
+    return json.dumps(go(live()))
 
+def live():
     session = requests.session(headers=headers)
 
     d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml')
     stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
     raw_document = d.content
+    return raw_document
 
-    #raw_document = file('tests/intallbuses.kml').read()
+def go(raw_document):
 
-    raw_document = raw_document.decode('latin1')
-    raw_document = raw_document.encode('utf-8', 'xmlcharrefreplace')
-    raw_document = fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(raw_document)
+    raw_document = raw_document.decode('iso-8859-1')
+    raw_document = raw_document.encode('utf-8')
+    #raw_document = fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(raw_document)
 
     t = etree.fromstring(raw_document)
 
@@ -110,8 +111,25 @@ application = bottle.default_app()
 
 
 if __name__ == '__main__':
-#    import pprint
-#    pprint.pprint(go())
-    from bottle import run
-    debug(True)
-    run(reloader=True)
+    parser = argparse.ArgumentParser(description='Make real-time data about Albuquerque buses less stupid')
+    parser.add_argument('--filename', '-i', help='Offline KML file to parse')
+    parser.add_argument('--live', action='store_true', default=False, help='Fetch live data from ABQdata')
+
+    args = parser.parse_args()
+
+    # fetch data live
+    if args.live:
+        import pprint
+        pprint.pprint(go(live()))
+    # if we've a filename, process it and quit
+    elif args.filename:
+        import pprint
+
+        with open(args.filename) as fp:
+            data = fp.read()
+            pprint.pprint(go(data))
+    # if no filename, start Web server for live querying
+    else:
+        from bottle import run
+        debug(True)
+        run(reloader=True)
