@@ -16,14 +16,20 @@ import requests
 from bottle import route, debug, response
 from lxml import etree
 
+
 def utf8_encode_callback(m):
     return unicode(m).encode()
 
 def fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(s):
     return re.sub('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', utf8_encode_callback, s)
 
+
 headers = {'user-agent': 'Code 66 hackathon'}
 namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
+
+# create persistent session, so we don't hammer ABQ's servers too much
+session = requests.session(headers=headers)
+
 
 @route('/')
 @route('/nyan') # backward compatibility, remove this
@@ -32,7 +38,6 @@ def returnJson():
     return json.dumps(go(live()))
 
 def live():
-    session = requests.session(headers=headers)
 
     d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml')
     stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
