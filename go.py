@@ -3,12 +3,15 @@
 
 from __future__ import unicode_literals
 
-import bottle
-from bottle import route, debug, response
 import json
-import requests
-from lxml import etree
 import re
+
+import bottle
+import requests
+
+from bottle import route, debug, response
+from lxml import etree
+
 
 headers = {'user-agent': 'Code 66 hackathon'}
 namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
@@ -66,6 +69,7 @@ def go():
         speed = speed.split()[0]
         r['speed'] = float(speed)
 
+        # Message Time
         msg_time = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Msg Time"]/following-sibling::*', namespaces=namespaces)[0].text
         r['msg_time'] = msg_time
 
