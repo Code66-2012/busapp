@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim: ts=2 sw=2 et
 
 from __future__ import unicode_literals
 
