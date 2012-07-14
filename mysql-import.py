@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 
-from __future__ import unicode_literals
+import json
 
 import MySQLdb
+import memcache
 
 import go
+
 
 if __name__ == '__main__':
     conn = MySQLdb.connect('localhost', user='root', db='code66')
     cur = conn.cursor()
 
+    mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+
     data = go.go(go.live())
+
+    mc.set('latest', json.dumps(data))
 
     for row in data:
         row['lat'] = row['coords']['lat']
