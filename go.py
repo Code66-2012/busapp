@@ -4,10 +4,11 @@
 from __future__ import unicode_literals
 
 import bottle
-from bottle import route, response
+from bottle import route, debug, response
 import json
 import requests
 from lxml import etree
+import re
 
 headers = {'user-agent': 'Code 66 hackathon'}
 namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
@@ -15,11 +16,12 @@ namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
 @route('/')
 @route('/nyan') # backward compatibility, remove this
 def go():
-    response.content_type = 'application/json'
+    #response.content_type = 'application/json'
 
     session = requests.session(headers=headers)
 
     d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml')
+    stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
     raw_document = d.content
 
     raw_document = file('tests/intallbuses.kml').read()
@@ -48,6 +50,17 @@ def go():
             continue
         r['route_id'] = route_id
 
+        # Next Stop
+        next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)[0].text
+        next_stop = re.match('(.*) @(.*) scheduled', next_stop)
+        import pprint
+        pprint.pprint(next_stop)
+        if next_stop:
+          next_stop = next_stop.groups()
+        else:
+          print next_stop
+        r['next_stop'] = next_stop
+
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text
         speed = speed.split()[0]
@@ -68,4 +81,5 @@ if __name__ == '__main__':
 #    import pprint
 #    pprint.pprint(go())
     from bottle import run
+    debug(True)
     run(reloader=True)
