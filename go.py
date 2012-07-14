@@ -63,7 +63,7 @@ def go():
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text
         speed = speed.split()[0]
-        r['speed'] = speed
+        r['speed'] = float(speed)
 
         msg_time = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Msg Time"]/following-sibling::*', namespaces=namespaces)[0].text
         r['msg_time'] = msg_time
@@ -77,7 +77,6 @@ def go():
         r['coords'] = coords_out
 
         r['bus_id'] = bus_id
-        r['speed'] = speed
         bus_elements_output.append(r)
     return json.dumps(bus_elements_output)
 
