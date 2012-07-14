@@ -54,9 +54,10 @@ def go():
         next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)[0].text
         next_stop = re.match('(.*) @(.*) scheduled', next_stop)
         if next_stop:
-          next_stop = next_stop.groups()
+            next_stop = next_stop.groups()
+            next_stop = [i.strip() for i in next_stop]
         else:
-          print next_stop
+            print next_stop
         r['next_stop'] = next_stop
 
         # Speed
