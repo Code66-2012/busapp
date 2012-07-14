@@ -20,6 +20,9 @@ namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
 
 @route('/')
 @route('/nyan') # backward compatibility, remove this
+def returnJson():
+    return json.dumps(go())
+
 def go():
     response.content_type = 'application/json'
 
@@ -88,8 +91,12 @@ def go():
         coords_out['lat'] = float(coords[1])
         r['coords'] = coords_out
 
+        # Heading
+        heading = bus_element.xpath('kml:Style/kml:IconStyle/kml:heading', namespaces=namespaces)[0].text
+        r['heading'] = int(heading)
+
         bus_elements_output.append(r)
-    return json.dumps(bus_elements_output)
+    return bus_elements_output
 
 application = bottle.default_app()
 
