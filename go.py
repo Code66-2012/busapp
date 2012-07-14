@@ -45,7 +45,7 @@ def go():
 
         # Bus ID
         bus_id = bus_element.xpath('kml:name', namespaces=namespaces)[0].text
-        r['bus_id'] = bus_id
+        r['bus_id'] = int(bus_id)
 
         # Route ID
         route_id = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Route"]/following-sibling::*', namespaces=namespaces)
@@ -54,7 +54,7 @@ def go():
         route_id = route_id[0].text
         if route_id == 'Off Duty':
             continue
-        r['route_id'] = route_id
+        r['route_id'] = int(route_id)
 
         # Next Stop
         next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)[0].text
