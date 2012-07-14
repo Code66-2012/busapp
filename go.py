@@ -68,6 +68,14 @@ def go():
         msg_time = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Msg Time"]/following-sibling::*', namespaces=namespaces)[0].text
         r['msg_time'] = msg_time
 
+        # Coordinates
+        coords = bus_element.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
+        coords = coords.split(',')
+        coords_out = {}
+        coords_out['lon'] = float(coords[0])
+        coords_out['lat'] = float(coords[1])
+        r['coords'] = coords_out
+
         r['bus_id'] = bus_id
         r['speed'] = speed
         bus_elements_output.append(r)
