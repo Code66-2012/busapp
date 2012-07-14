@@ -2,19 +2,21 @@
 
 from __future__ import unicode_literals
 
-import codecs
+import bottle
+from bottle import route
+import json
 import requests
 from lxml import etree
 
 headers = {'user-agent': 'Code 66 hackathon'}
 namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
 
+@route('/nyan')
 def go():
     session = requests.session(headers=headers)
 
     d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml')
     raw_document = d.content
-    print 'raw document length:', len(raw_document)
 
     raw_document = file('tests/intallbuses.kml').read()
 
@@ -53,8 +55,13 @@ def go():
         r['bus_id'] = bus_id
         r['speed'] = speed
         bus_elements_output.append(r)
-    return bus_elements_output
+    return json.dumps(bus_elements_output)
+
+application = bottle.default_app()
+
 
 if __name__ == '__main__':
-    import pprint
-    pprint.pprint(go())
+#    import pprint
+#    pprint.pprint(go())
+    from bottle import run
+    run(reloader=True)
