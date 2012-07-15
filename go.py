@@ -147,6 +147,9 @@ def go(raw_document):
         next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)
         if not next_stop:
             next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Deadhead"]/following-sibling::*', namespaces=namespaces)
+        if not next_stop:
+            # how and why did we get here? bus is operating, but no next stop?
+            continue
         next_stop = next_stop[0].text
         next_stop = re.match('(Next stop is )?(.*) @(.*) scheduled', next_stop)
         if next_stop:
