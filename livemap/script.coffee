@@ -85,11 +85,7 @@ updateStops = (json) ->
 	map = window.map
 
 	for item in json
-		console.log item
 		stop_id = item.stopID
-		console.log stop_id
-		console.log item.lat, item.lon
-		console.log parseFloat(item.lat), parseFloat(item.lon)
 		stop_location = new L.LatLng(parseFloat(item.lat), parseFloat(item.lon))
 		stop_ids_created = []
 
@@ -107,6 +103,29 @@ updateStops = (json) ->
 				stop_location
 				icon: new stop_icon
 			)
+
+			m.stop_id = stop_id
+
+			m.on 'click', (e) ->
+				params = stop_id: this.stop_id
+				$.ajax(
+					url: 'http://blitzforge.com/distance.php'
+					dataType: 'json'
+					data: params
+					success: (json) =>
+						console.log json
+						html = ""
+						for route, busItem of json
+							html = html + "<div><h3>Route #{ route }</h3><ul>"
+							for bus, info of busItem
+								html = html + "<li>Bus #{ bus } in ~#{ info.time } min</li>"
+							html = html + "</ul></div>"
+
+						console.log html
+							
+						this.bindPopup(html).openPopup()
+				)
+						
 			map.addLayer(m)
 			markers['stop' + stop_id] = m
 			stop_ids_created.push	stop_id
@@ -128,7 +147,7 @@ updateUs = (e) ->
 	markers = window.markers
 
 	# Recenter zoom and map
-	#window.map.setView(e.latlng, 14)
+	window.map.setView(e.latlng, 16)
 
 	# If marker has been created already, update position
 	if markers['us']?

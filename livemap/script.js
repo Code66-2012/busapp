@@ -72,11 +72,7 @@
     _results = [];
     for (_i = 0, _len = json.length; _i < _len; _i++) {
       item = json[_i];
-      console.log(item);
       stop_id = item.stopID;
-      console.log(stop_id);
-      console.log(item.lat, item.lon);
-      console.log(parseFloat(item.lat), parseFloat(item.lon));
       stop_location = new L.LatLng(parseFloat(item.lat), parseFloat(item.lon));
       stop_ids_created = [];
       stop_icon = L.Icon.extend({
@@ -87,6 +83,35 @@
       } else {
         m = new L.Marker(stop_location, {
           icon: new stop_icon
+        });
+        m.stop_id = stop_id;
+        m.on('click', function(e) {
+          var params,
+            _this = this;
+          params = {
+            stop_id: this.stop_id
+          };
+          return $.ajax({
+            url: 'http://blitzforge.com/distance.php',
+            dataType: 'json',
+            data: params,
+            success: function(json) {
+              var bus, busItem, html, info, route;
+              console.log(json);
+              html = "";
+              for (route in json) {
+                busItem = json[route];
+                html = html + ("<div><h3>Route " + route + "</h3><ul>");
+                for (bus in busItem) {
+                  info = busItem[bus];
+                  html = html + ("<li>Bus " + bus + " in ~" + info.time + " min</li>");
+                }
+                html = html + "</ul></div>";
+              }
+              console.log(html);
+              return _this.bindPopup(html).openPopup();
+            }
+          });
         });
         map.addLayer(m);
         markers['stop' + stop_id] = m;
@@ -110,6 +135,7 @@
       success: updateStops
     });
     markers = window.markers;
+    window.map.setView(e.latlng, 16);
     if (markers['us'] != null) {
       m = window.markers['us'];
       return m.setLatLng(e.latlng);
