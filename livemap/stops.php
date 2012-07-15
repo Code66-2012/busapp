@@ -10,11 +10,11 @@ if ($_GET['lat'] && $_GET['lon']) {
 	mysql_select_db('code66');
 
 	$lat = floatval($_GET['lat']);
-	$lat_ceil = $lat + .003;
-	$lat_floor = $lat - .003;
+	$lat_ceil = $lat + .002;
+	$lat_floor = $lat - .002;
 	$lon = floatval($_GET['lon']);
-	$lon_ceil = $lon + .003;
-	$lon_floor = $lon - .003;
+	$lon_ceil = $lon + .002;
+	$lon_floor = $lon - .002;
 
 	$query = sprintf("SELECT * FROM stops WHERE (lat < %F && lat > %F) && (lon < %F && lon > %F)", $lat_ceil, $lat_floor, $lon_ceil, $lon_floor);
 
