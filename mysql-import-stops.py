@@ -7,41 +7,41 @@ import memcache
 
 import go
 
-
 if __name__ == '__main__':
     conn = MySQLdb.connect('localhost', user='dev', passwd='root', db='code66')
     cur = conn.cursor()
 
     mc = memcache.Client(['127.0.0.1:11211'], debug=0)
 
-    data = go.go(go.live())
+    data = go.get_stops()
 
-    mc.set('latest', json.dumps(data))
+    #print json.dumps(data)
+    #mc.set('latest', json.dumps(data))
 
     for row in data:
         row['lat'] = row['coords']['lat']
         row['lon'] = row['coords']['lon']
-        q = """insert into locations (
-                    date,
-                    date_w3cdtf,
-                    routeID,
-                    busID,
+        q = """insert into stops (
+                    stopID,
+                    routes,
                     lat,
                     lon,
-                    speed,
-                    heading
+                    street,
+                    intersection,
+                    direction
                 ) values (
-                    '%(msg_time)s',
-                    '%(msg_time)s',
-                    %(route_id)s,
-                    %(bus_id)s,
+                    %(id)s,
+                    '%(routes)s',
                     %(lat)s,
                     %(lon)s,
-                    %(speed)s,
-                    %(heading)s)""" % row
+                    '%(street)s',
+                    '%(intersection)s',
+                    '%(direction)s')""" % row
         #print q
         cur.execute(q)
         conn.commit()
 
     cur.close()
     conn.close()
+
+
