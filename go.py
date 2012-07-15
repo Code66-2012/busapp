@@ -113,7 +113,6 @@ def get_stop_id(streets):
     street = streets[0]
     intersection = streets[1]
     q = """SELECT stopID FROM stops WHERE street = '%s' AND intersection = '%s'""" % (street, intersection)
-    print q
     stopID = cur.execute(q)
     return stopID
 
@@ -156,7 +155,6 @@ def go(raw_document):
             next_stop = next_stop.groups()
             next_stop = next_stop[-2:]
             next_stop = [i.strip() for i in next_stop]
-        print next_stop
         next_stop_id = get_stop_id(next_stop)
         r['next_stop'] = {'stopID': next_stop_id, 'streets':next_stop}
 
