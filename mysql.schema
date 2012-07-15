@@ -40,7 +40,6 @@ CREATE TABLE IF NOT EXISTS `locations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `stops` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   `stopID` int(11) NOT NULL,
   `routes` varchar(20) NOT NULL,
   `lat` float NOT NULL,
@@ -48,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `stops` (
   `street` text NOT NULL,
   `intersection` text NOT NULL,
   `direction` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`stopID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
