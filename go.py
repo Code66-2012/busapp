@@ -15,6 +15,9 @@ import requests
 
 from bottle import route, debug, response
 from lxml import etree
+import re
+import zipfile
+from StringIO import StringIO
 
 
 def utf8_encode_callback(m):
@@ -40,17 +43,75 @@ def returnJson():
 def live():
 
     d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml')
-    stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
     raw_document = d.content
+
     return raw_document
 
+def allstops():
+    session = requests.session(headers=headers)
+
+    stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
+    raw_stops = stops
+    raw_stops = stops.content
+
+    return raw_stops
+
+def get_stop_id(streets, stops):
+    stop_id = ''
+
+    #stop = list(set(streets[0]) & set(stops[]))
+    #print stops
+    #print '\n\n'
+
+    return stop_id
+
 def go(raw_document):
+
+    raw_stops = allstops()
+    raw_stops = zipfile.ZipFile(StringIO(raw_stops), 'r')
+    raw_stops = raw_stops.open('doc.kml').read()
+    raw_stops = raw_stops.replace('http://earth.google.com/kml/2.2', namespaces['kml'])
+    raw_stops = raw_stops.replace('<![CDATA[', '')
+    raw_stops = raw_stops.replace(']]>', '')
+    raw_stops = raw_stops.decode('iso-8859-1')
+    raw_stops = raw_stops.encode('utf-8')
 
     raw_document = raw_document.decode('iso-8859-1')
     raw_document = raw_document.encode('utf-8')
     #raw_document = fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(raw_document)
 
     t = etree.fromstring(raw_document)
+    st = etree.fromstring(raw_stops)
+    stop_elements = st.xpath('//kml:Placemark', namespaces=namespaces)
+    stop_elements_output = []
+    for stop in stop_elements:
+        r = {}
+
+        #stop_id
+        stop_routes = stop.xpath('kml:name', namespaces=namespaces)[0].text
+        r['routes'] = stop_routes
+
+        stop_coords = stop.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
+        r['coords'] = stop_coords
+
+        # change to description scope
+        #stop = stop.xpath('kml:description//kml:table', namespaces=namespaces)
+
+        stop_id = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Stop ID"]/following-sibling::*', namespaces=namespaces)[0].text
+        if stop_id == '0':
+            continue
+        r['id'] = stop_id
+
+        stop_street = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Street"]/following-sibling::*', namespaces=namespaces)[0].text
+        r['street'] = stop_street
+        #print stop_street
+        stop_intersection = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Nearest Intersection"]/following-sibling::*', namespaces=namespaces)[0].text
+        r['intersection'] = stop_intersection
+
+        stop_direction = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Direction"]/following-sibling::*', namespaces=namespaces)[0].text
+        r['direction'] = stop_direction
+
+        stop_elements_output.append(r)
 
     bus_elements = t.xpath('//kml:Placemark', namespaces=namespaces)
     bus_elements_output = []
@@ -80,9 +141,8 @@ def go(raw_document):
             next_stop = next_stop.groups()
             next_stop = next_stop[-2:]
             next_stop = [i.strip() for i in next_stop]
-        else:
-            print next_stop
-        r['next_stop'] = next_stop
+        next_stop_id = get_stop_id(next_stop, stop_elements_output)
+        r['next_stop'] = {'streets':next_stop}
 
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text
