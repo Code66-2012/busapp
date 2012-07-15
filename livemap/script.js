@@ -98,7 +98,7 @@
             success: function(json) {
               var bus, busItem, html, info, route;
               console.log(json);
-              html = "";
+              html = "<h2>Stop " + _this.stop_id + "</h2>";
               for (route in json) {
                 busItem = json[route];
                 html = html + ("<div><h3>Route " + route + "</h3><ul>");

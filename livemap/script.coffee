@@ -114,7 +114,7 @@ updateStops = (json) ->
 					data: params
 					success: (json) =>
 						console.log json
-						html = ""
+						html = "<h2>Stop #{ this.stop_id }</h2>"
 						for route, busItem of json
 							html = html + "<div><h3>Route #{ route }</h3><ul>"
 							for bus, info of busItem
@@ -124,6 +124,12 @@ updateStops = (json) ->
 						console.log html
 							
 						this.bindPopup(html).openPopup()
+#					error: (json) =>
+#							html = "<div><h3>No buses for route #{ this.stop_id } today</h3><ul>"
+#
+#						console.log html
+#							
+#						this.bindPopup(html).openPopup()
 				)
 						
 			map.addLayer(m)
