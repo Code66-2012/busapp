@@ -5,6 +5,7 @@ $return = array();
 if ($_GET['lat'] && $_GET['lon']) {
 	header('Access-Control-Allow-Origin');
 	header('Content-type: application/json');
+	header('Access-Control-Allow-Origin: *');
 	//$sql = new mysqli('localhost', 'dev', 'root', 'code66');
 	mysql_connect('localhost', 'root', '');
 	mysql_select_db('code66');
