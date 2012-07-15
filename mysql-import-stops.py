@@ -16,7 +16,7 @@ if __name__ == '__main__':
     data = go.get_stops()
 
     #print json.dumps(data)
-    #mc.set('latest', json.dumps(data))
+    mc.set('stops', json.dumps(data))
 
     for row in data:
         row['lat'] = row['coords']['lat']

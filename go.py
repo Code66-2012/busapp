@@ -18,6 +18,8 @@ from lxml import etree
 import re
 import zipfile
 from StringIO import StringIO
+import MySQLdb
+import memcache
 
 
 def utf8_encode_callback(m):
@@ -99,6 +101,21 @@ def get_stops():
 
     return stop_elements_output
 
+def get_stop_id(streets):
+    conn = MySQLdb.connect('localhost', user='dev', passwd='root', db='code66')
+    cur = conn.cursor()
+
+    #mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+
+    if not streets:
+        return
+    #stops = mc.get('latest')
+    street = streets[0]
+    intersection = streets[1]
+    q = """SELECT stopID FROM stops WHERE street = '%s' AND intersection = '%s'""" % (street, intersection)
+    print q
+    stopID = cur.execute(q)
+    return stopID
 
 def go(raw_document):
 
@@ -136,8 +153,9 @@ def go(raw_document):
             next_stop = next_stop.groups()
             next_stop = next_stop[-2:]
             next_stop = [i.strip() for i in next_stop]
-        next_stop_id = get_stop_id(next_stop, stop_elements_output)
-        r['next_stop'] = {'streets':next_stop}
+        print next_stop
+        next_stop_id = get_stop_id(next_stop)
+        r['next_stop'] = {'stopID': next_stop_id, 'streets':next_stop}
 
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text

@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `locations` (
 CREATE TABLE IF NOT EXISTS `stops` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `stopID` int(11) NOT NULL,
-  `routes` int(11) NOT NULL,
+  `routes` varchar(20) NOT NULL,
   `lat` float NOT NULL,
   `lon` float NOT NULL,
   `street` text NOT NULL,
