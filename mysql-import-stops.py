@@ -19,6 +19,9 @@ if __name__ == '__main__':
     mc.set('stops', json.dumps(data))
 
     for row in data:
+        q_exists = """SELECT stopID FROM stops WHERE stopID = '%s'""" % row['id']
+        if cur.execute(q_exists) > 0:
+            continue
         row['lat'] = row['coords']['lat']
         row['lon'] = row['coords']['lon']
         q = """insert into stops (
@@ -36,7 +39,8 @@ if __name__ == '__main__':
                     %(lon)s,
                     '%(street)s',
                     '%(intersection)s',
-                    '%(direction)s')""" % row
+                    '%(direction)s')
+                """ % row
         #print q
         cur.execute(q)
         conn.commit()
