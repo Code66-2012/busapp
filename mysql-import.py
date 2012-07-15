@@ -9,7 +9,7 @@ import go
 
 
 if __name__ == '__main__':
-    conn = MySQLdb.connect('localhost', user='dev', passwd='root', db='code66')
+    conn = MySQLdb.connect('localhost', user='root', db='code66')
     cur = conn.cursor()
 
     mc = memcache.Client(['127.0.0.1:11211'], debug=0)

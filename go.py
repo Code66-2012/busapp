@@ -102,7 +102,7 @@ def get_stops():
     return stop_elements_output
 
 def get_stop_id(streets):
-    conn = MySQLdb.connect('localhost', user='dev', passwd='root', db='code66')
+    conn = MySQLdb.connect('localhost', user='root', db='code66')
     cur = conn.cursor()
 
     #mc = memcache.Client(['127.0.0.1:11211'], debug=0)
