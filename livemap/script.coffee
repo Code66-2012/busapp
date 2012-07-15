@@ -25,12 +25,16 @@ $(document).ready ->
 
 	fetchBusLocations()
 
+################################################################################
+
 fetchBusLocations = () ->
 	$.getJSON(
 		'http://blitzforge.com/nyan'
 		processNewJson
 	)
 	window.setTimeout(fetchBusLocations, 30*1000)
+
+################################################################################
 
 processNewJson = (json) ->
 	nyanbus = L.Icon.extend(
@@ -71,13 +75,55 @@ processNewJson = (json) ->
 #		delete markers[bus_id]
 #		bus_ids_deleted.push(bus_id)
 
-
 	console.log 'Created buses: ' + bus_ids_created.join(',')
 	console.log 'Updated buses: ' + bus_ids_updated.join(',')
 	console.log 'Deleted buses: ' + bus_ids_deleted.join(',')
 
+################################################################################
+
+updateStops = (json) ->
+	map = window.map
+
+	for item in json
+		console.log item
+		stop_id = item.stopID
+		console.log stop_id
+		console.log item.lat, item.lon
+		console.log parseFloat(item.lat), parseFloat(item.lon)
+		stop_location = new L.LatLng(parseFloat(item.lat), parseFloat(item.lon))
+		stop_ids_created = []
+
+		stop_icon = L.Icon.extend(
+			iconUrl: 'marker-icon-purple.png'
+		)
+
+		# If the stop is already on the map, ignore
+		if markers['stop' + stop_id]?
+			continue
+
+		# Stop is not on the map
+		else
+			m = new L.Marker(
+				stop_location
+				icon: new stop_icon
+			)
+			map.addLayer(m)
+			markers['stop' + stop_id] = m
+			stop_ids_created.push	stop_id
+
+################################################################################
+
 updateUs = (e) ->
 	console.log('Found location ' + e.latlng)
+
+	# Fetch closest stops
+	params = lat: e.latlng.lat, lon: e.latlng.lng
+	$.ajax(
+		url: 'http://blitzforge.com/stops.php'
+		dataType: 'json'
+		data : params
+		success: updateStops
+	)
 
 	markers = window.markers
 
