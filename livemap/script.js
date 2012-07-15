@@ -1,5 +1,6 @@
 (function() {
-  var fetchBusLocations, processNewJson, updateUs;
+  var fetchBusLocations, processNewJson, updateUs,
+    __indexOf = Array.prototype.indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   $(document).ready(function() {
     var abq, map, mapquest, mapquestAttrib, mapquestUrl, subDomains;
@@ -12,12 +13,17 @@
 	<a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.';
     mapquest = new L.TileLayer(mapquestUrl, {
       maxZoom: 18,
-      attribution: mapquestAttrib,
       subdomains: subDomains
     });
     abq = new L.LatLng(35.08411, -106.65098);
     map.setView(abq, 12);
     map.addLayer(mapquest);
+    map.on('zoomstart', function(e) {
+      return $('body').addClass('zoom-in-progress');
+    });
+    map.on('zoomend', function(e) {
+      return $('body').removeClass('zoom-in-progress');
+    });
     map.on('locationfound', updateUs);
     map.locate({
       watch: true,
@@ -32,50 +38,64 @@
   };
 
   processNewJson = function(json) {
-    var bus_id, bus_location, bus_marker, item, markers, nyanbus, _i, _len, _results;
+    var bus_id, bus_ids_created, bus_ids_deleted, bus_ids_updated, bus_location, bus_marker, item, map, marker, markers, nyanbus, _i, _len;
+    nyanbus = L.Icon.extend({
+      iconUrl: 'nyan-catbus-trans-cropped.gif',
+      iconSize: new L.Point(57, 21)
+    });
     markers = window.markers;
-    _results = [];
+    map = window.map;
+    bus_ids_created = [];
+    bus_ids_updated = [];
+    bus_ids_deleted = [];
     for (_i = 0, _len = json.length; _i < _len; _i++) {
       item = json[_i];
       bus_id = item.bus_id;
       bus_location = new L.LatLng(item.coords.lat, item.coords.lon);
-      nyanbus = L.Icon.extend({
-        iconUrl: 'nyan-catbus-trans-cropped.gif',
-        iconSize: new L.Point(57, 21)
-      });
       if (markers[bus_id] != null) {
-        console.log('Updating position for bus' + bus_id);
-        _results.push(markers[bus_id].setLatLng(bus_location));
+        bus_ids_updated.push(bus_id);
+        markers[bus_id].setLatLng(bus_location);
       } else {
-        console.log('Creating marker for bus' + bus_id);
+        bus_ids_created.push(bus_id);
         bus_marker = new L.Marker(bus_location);
         map.addLayer(bus_marker);
-        _results.push(markers[bus_id] = bus_marker);
+        markers[bus_id] = bus_marker;
       }
     }
-    return _results;
+    for (bus_id in markers) {
+      marker = markers[bus_id];
+      if (__indexOf.call(bus_ids_updated, bus_id) >= 0 || __indexOf.call(bus_ids_created, bus_id) >= 0) {
+        continue;
+      }
+      map.removeLayer(marker);
+      delete markers[bus_id];
+      bus_ids_deleted.push(bus_id);
+    }
+    console.log('Created buses: ' + bus_ids_created.join(','));
+    console.log('Updated buses: ' + bus_ids_updated.join(','));
+    return console.log('Deleted buses: ' + bus_ids_deleted.join(','));
   };
 
   updateUs = function(e) {
-    var marker, markers, me_icon, nyandog;
+    var m, markers, me_icon, nyandog_icon;
     console.log('Found location ' + e.latlng);
     markers = window.markers;
     if (markers['us'] != null) {
-      marker = window.markers.us;
-      return marker.setLatLng(e.latlng);
+      m = window.markers['us'];
+      return m.setLatLng(e.latlng);
     } else {
-      nyandog = L.Icon.extend({
+      nyandog_icon = L.Icon.extend({
         iconUrl: 'nyan-dog.png',
         iconSize: new L.Point(77, 22)
       });
       me_icon = L.Icon.extend({
         iconUrl: 'marker-icon-red.png'
       });
-      marker = new L.Marker(e.latlng, {
+      m = new L.Marker(e.latlng, {
         icon: new me_icon
       });
-      map.addLayer(marker);
-      return markers['us'] = nyandog;
+      map.addLayer(m);
+      return markers['us'] = m;
     }
   };
 

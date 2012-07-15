@@ -64,7 +64,7 @@ processNewJson = (json) ->
 
 	# Remove buses we are no longer tracking
 	for bus_id, marker of markers
-		if bus_id in bus_ids_updated
+		if bus_id in bus_ids_updated or bus_id in bus_ids_created
 			continue
 
 		map.removeLayer(marker)
