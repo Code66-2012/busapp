@@ -63,13 +63,13 @@ processNewJson = (json) ->
 			markers[bus_id] = bus_marker
 
 	# Remove buses we are no longer tracking
-	for bus_id, marker of markers
-		if bus_id in bus_ids_updated or bus_id in bus_ids_created
-			continue
-
-		map.removeLayer(marker)
-		delete markers[bus_id]
-		bus_ids_deleted.push(bus_id)
+#	for bus_id, marker of markers
+#		if bus_id in bus_ids_updated or bus_id in bus_ids_created
+#			continue
+#
+#		map.removeLayer(marker)
+#		delete markers[bus_id]
+#		bus_ids_deleted.push(bus_id)
 
 
 	console.log 'Created buses: ' + bus_ids_created.join(',')

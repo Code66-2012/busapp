@@ -1,6 +1,5 @@
 (function() {
-  var fetchBusLocations, processNewJson, updateUs,
-    __indexOf = Array.prototype.indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var fetchBusLocations, processNewJson, updateUs;
 
   $(document).ready(function() {
     var abq, map, mapquest, mapquestAttrib, mapquestUrl, subDomains;
@@ -38,7 +37,7 @@
   };
 
   processNewJson = function(json) {
-    var bus_id, bus_ids_created, bus_ids_deleted, bus_ids_updated, bus_location, bus_marker, item, map, marker, markers, nyanbus, _i, _len;
+    var bus_id, bus_ids_created, bus_ids_deleted, bus_ids_updated, bus_location, bus_marker, item, map, markers, nyanbus, _i, _len;
     nyanbus = L.Icon.extend({
       iconUrl: 'nyan-catbus-trans-cropped.gif',
       iconSize: new L.Point(57, 21)
@@ -61,15 +60,6 @@
         map.addLayer(bus_marker);
         markers[bus_id] = bus_marker;
       }
-    }
-    for (bus_id in markers) {
-      marker = markers[bus_id];
-      if (__indexOf.call(bus_ids_updated, bus_id) >= 0 || __indexOf.call(bus_ids_created, bus_id) >= 0) {
-        continue;
-      }
-      map.removeLayer(marker);
-      delete markers[bus_id];
-      bus_ids_deleted.push(bus_id);
     }
     console.log('Created buses: ' + bus_ids_created.join(','));
     console.log('Updated buses: ' + bus_ids_updated.join(','));
