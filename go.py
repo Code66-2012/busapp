@@ -47,27 +47,12 @@ def live():
 
     return raw_document
 
-def allstops():
+def get_stops():
     session = requests.session(headers=headers)
 
     stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
-    raw_stops = stops
     raw_stops = stops.content
 
-    return raw_stops
-
-def get_stop_id(streets, stops):
-    stop_id = ''
-
-    #stop = list(set(streets[0]) & set(stops[]))
-    #print stops
-    #print '\n\n'
-
-    return stop_id
-
-def go(raw_document):
-
-    raw_stops = allstops()
     raw_stops = zipfile.ZipFile(StringIO(raw_stops), 'r')
     raw_stops = raw_stops.open('doc.kml').read()
     raw_stops = raw_stops.replace('http://earth.google.com/kml/2.2', namespaces['kml'])
@@ -76,11 +61,6 @@ def go(raw_document):
     raw_stops = raw_stops.decode('iso-8859-1')
     raw_stops = raw_stops.encode('utf-8')
 
-    raw_document = raw_document.decode('iso-8859-1')
-    raw_document = raw_document.encode('utf-8')
-    #raw_document = fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(raw_document)
-
-    t = etree.fromstring(raw_document)
     st = etree.fromstring(raw_stops)
     stop_elements = st.xpath('//kml:Placemark', namespaces=namespaces)
     stop_elements_output = []
@@ -92,7 +72,11 @@ def go(raw_document):
         r['routes'] = stop_routes
 
         stop_coords = stop.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
-        r['coords'] = stop_coords
+        stop_coords = stop_coords.split(',')
+        coords_out = {}
+        coords_out['lon'] = float(stop_coords[0])
+        coords_out['lat'] = float(stop_coords[1])
+        r['coords'] = coords_out
 
         # change to description scope
         #stop = stop.xpath('kml:description//kml:table', namespaces=namespaces)
@@ -113,6 +97,17 @@ def go(raw_document):
 
         stop_elements_output.append(r)
 
+    return stop_elements_output
+
+
+def go(raw_document):
+
+    raw_document = raw_document.decode('iso-8859-1')
+    raw_document = raw_document.encode('utf-8')
+    #raw_document = fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(raw_document)
+
+    t = etree.fromstring(raw_document)
+    
     bus_elements = t.xpath('//kml:Placemark', namespaces=namespaces)
     bus_elements_output = []
     for bus_element in bus_elements:
