@@ -1,5 +1,5 @@
 (function() {
-  var fetchBusLocations, processNewJson, updateUs;
+  var fetchBusLocations, processNewJson, updateStops, updateUs;
 
   $(document).ready(function() {
     var abq, map, mapquest, mapquestAttrib, mapquestUrl, subDomains;
@@ -66,9 +66,49 @@
     return console.log('Deleted buses: ' + bus_ids_deleted.join(','));
   };
 
+  updateStops = function(json) {
+    var item, m, map, stop_icon, stop_id, stop_ids_created, stop_location, _i, _len, _results;
+    map = window.map;
+    _results = [];
+    for (_i = 0, _len = json.length; _i < _len; _i++) {
+      item = json[_i];
+      console.log(item);
+      stop_id = item.stopID;
+      console.log(stop_id);
+      console.log(item.lat, item.lon);
+      console.log(parseFloat(item.lat), parseFloat(item.lon));
+      stop_location = new L.LatLng(parseFloat(item.lat), parseFloat(item.lon));
+      stop_ids_created = [];
+      stop_icon = L.Icon.extend({
+        iconUrl: 'marker-icon-purple.png'
+      });
+      if (markers['stop' + stop_id] != null) {
+        continue;
+      } else {
+        m = new L.Marker(stop_location, {
+          icon: new stop_icon
+        });
+        map.addLayer(m);
+        markers['stop' + stop_id] = m;
+        _results.push(stop_ids_created.push(stop_id));
+      }
+    }
+    return _results;
+  };
+
   updateUs = function(e) {
-    var m, markers, me_icon, nyandog_icon;
+    var m, markers, me_icon, nyandog_icon, params;
     console.log('Found location ' + e.latlng);
+    params = {
+      lat: e.latlng.lat,
+      lon: e.latlng.lng
+    };
+    $.ajax({
+      url: 'http://blitzforge.com/stops.php',
+      dataType: 'json',
+      data: params,
+      success: updateStops
+    });
     markers = window.markers;
     if (markers['us'] != null) {
       m = window.markers['us'];
