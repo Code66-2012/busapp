@@ -22,7 +22,14 @@ $(document).ready ->
 processNewJson = (json) ->
 	map = window.map
 	for item in json
+		bus_id = item.bus_id
 		bus_location = new L.LatLng(item.coords.lat, item.coords.lon)
-		bus_marker = new L.Marker(bus_location)
+		nyanbus = L.Icon.extend(
+			iconUrl: 'nyan-catbus-trans-cropped.gif'
+			iconSize: new L.Point(57, 21)
+		)
+		bus_marker = new L.Marker(
+			bus_location
+			icon: new nyanbus
+		)
 		map.addLayer(bus_marker)
-		

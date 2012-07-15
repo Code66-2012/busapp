@@ -22,13 +22,20 @@
   });
 
   processNewJson = function(json) {
-    var bus_location, bus_marker, item, map, _i, _len, _results;
+    var bus_id, bus_location, bus_marker, item, map, nyanbus, _i, _len, _results;
     map = window.map;
     _results = [];
     for (_i = 0, _len = json.length; _i < _len; _i++) {
       item = json[_i];
+      bus_id = item.bus_id;
       bus_location = new L.LatLng(item.coords.lat, item.coords.lon);
-      bus_marker = new L.Marker(bus_location);
+      nyanbus = L.Icon.extend({
+        iconUrl: 'nyan-catbus-trans-cropped.gif',
+        iconSize: new L.Point(57, 21)
+      });
+      bus_marker = new L.Marker(bus_location, {
+        icon: new nyanbus
+      });
       _results.push(map.addLayer(bus_marker));
     }
     return _results;
