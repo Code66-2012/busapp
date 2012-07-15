@@ -7,6 +7,25 @@
 			body {
 				margin: 0;
 			}
+
+			.leaflet-marker-icon,
+			.leaflet-marker-shadow {
+				transition: all 5s;
+				-moz-transition: all 5s;
+				-webkit-transition: all 5s;
+				-o-transition: all 5s;
+				-ms-transition: all 5s;
+			}
+
+			/* doesn't work? */
+			.zoom-in-progress .leaflet-marker-icon,
+			.zoom-in-progress .leaflet-marker-shadow {
+				transition: all 1s;
+				-moz-transition: all 1s;
+				-webkit-transition: all 1s;
+				-o-transition: all 1s;
+				-ms-transition: all 1s;
+			}
 		</style>
 		
 		<script src="http://code.jquery.com/jquery.min.js"></script>

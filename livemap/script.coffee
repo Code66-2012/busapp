@@ -14,6 +14,12 @@ $(document).ready ->
 
 	map.addLayer(mapquest)
 
+	# Fix marker animation on zoom
+	map.on 'zoomstart', (e) ->
+		$('body').addClass('zoom-in-progress')
+	map.on 'zoomend', (e) ->
+		$('body').removeClass('zoom-in-progress')
+
 	map.on('locationfound', updateUs)
 	map.locate(watch: true, enableHighAccuracy: true)
 
@@ -33,21 +39,42 @@ processNewJson = (json) ->
 	)
 
 	markers = window.markers
+	map = window.map
+
+	bus_ids_created = []
+	bus_ids_updated = []
+	bus_ids_deleted = []
 
 	for item in json
 		bus_id = item.bus_id
 		bus_location = new L.LatLng(item.coords.lat, item.coords.lon)
 		
+		# Update position of bus
 		if markers[bus_id]?
-			console.log 'Updating position for bus ' + bus_id
+			bus_ids_updated.push(bus_id)
 			markers[bus_id].setLatLng(bus_location)
+		# Create markers for new bus
 		else
-			console.log 'Creating marker for bus ' + bus_id
+			bus_ids_created.push(bus_id)
 			bus_marker = new L.Marker(
 				bus_location
 			)
 			map.addLayer(bus_marker)
 			markers[bus_id] = bus_marker
+
+	# Remove buses we are no longer tracking
+	for bus_id, marker of markers
+		if bus_id in bus_ids_updated
+			continue
+
+		map.removeLayer(marker)
+		delete markers[bus_id]
+		bus_ids_deleted.push(bus_id)
+
+
+	console.log 'Created buses: ' + bus_ids_created.join(',')
+	console.log 'Updated buses: ' + bus_ids_updated.join(',')
+	console.log 'Deleted buses: ' + bus_ids_deleted.join(',')
 
 updateUs = (e) ->
 	console.log('Found location ' + e.latlng)
