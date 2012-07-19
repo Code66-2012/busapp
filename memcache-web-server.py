@@ -12,6 +12,9 @@ def get():
     response.set_header('Access-Control-Allow-Origin', '*')
     return mc.get('latest')
 
+# For running within a WSGI container
+application = bottle.default_app()
+
 if __name__ == '__main__':
     from bottle import run
     run(reloader=True)
