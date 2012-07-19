@@ -2,15 +2,15 @@
   var fetchBusLocations, processNewJson, updateStops, updateUs;
 
   $(document).ready(function() {
-    var abq, map, mapquest, mapquestAttrib, mapquestUrl, subDomains;
+    var abq, map, mapquest, mapquestUrl, mapquest_attribution, subDomains;
     map = new L.Map('map');
     window.map = map;
     window.markers = {};
     mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
     subDomains = ['otile1', 'otile2', 'otile3', 'otile4'];
-    mapquestAttrib = 'Data, imagery and map information provided by <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>,\
-	<a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.';
+    mapquest_attribution = '<small>Map © <a href="http://openstreetmap.org/">OpenStreetMap</a>, <a href="http://open.mapquest.com">MapQuest</a>; App: <a href="https://github.com/Code66-2012/busapp">Credits & source</a></small>';
     mapquest = new L.TileLayer(mapquestUrl, {
+      attribution: mapquest_attribution,
       maxZoom: 18,
       subdomains: subDomains
     });
