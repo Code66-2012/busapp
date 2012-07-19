@@ -74,7 +74,7 @@ function find_dist($lat,$lon,$new_shape=true){
 $sql = "SELECT `route_id` FROM  `abqride`.`stops_map` WHERE `stop_code` = ".$stop_id;
 $route_find = mysql_query($sql);
 if (!$route_find or !mysql_num_rows($route_find)){
-	die ("Error");
+	die (json_encode(array("error"=>"Stop Not Found")));
 }
 while ($row = mysql_fetch_array($route_find)){
 	$route_id = $row[0];
@@ -85,7 +85,7 @@ while ($row = mysql_fetch_array($route_find)){
 		$route_short_id = $row[0];
 	}
 	if (!isset($route_short_id)){
-		die("Route Not Found");
+		die(json_encode(array("error"=>"Route Not Found")));
 	}
 	
 	//echo "<p>Route ".$route_short_id."</p>";
@@ -114,11 +114,11 @@ while ($row = mysql_fetch_array($route_find)){
 		}
 		
 		//echo "D1:".$dist." D2:".$dist2;
-		if ((abs($dist) - abs($dist2)) > 0){
+		if ((abs($dist) - abs($dist2)) >= 0){
 			$dir = "(Traveling Away)";
 		}else{
 			$dir ="(Traveling Towards)";
-			$busses[$row['busID']] = array("distance"=>$dist,"time"=>$dist*3);
+			$busses[$row['busID']] = array("distance"=>$dist,"time"=>intval(round($dist*3)));
 		}
 		
 		
@@ -126,9 +126,9 @@ while ($row = mysql_fetch_array($route_find)){
 	}
 	
 	asort($busses);
-	
-	$routes[$route_short_id] = $busses;
-	
+	if (count($busses)>0){
+		$routes[$route_short_id] = $busses;
+	}
 	//foreach ($busses as $bus => $dist){
 	//	echo "$bus $dist <br/>";
 	//}
