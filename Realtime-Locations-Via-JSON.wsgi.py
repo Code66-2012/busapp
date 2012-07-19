@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import bottle
 import memcache
 
 from bottle import response, route
