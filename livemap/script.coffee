@@ -137,11 +137,28 @@ updateStops = (json) ->
 
 ################################################################################
 
+checkInAbq = (p) ->
+	abq_bbox = 'minlat': 34.947155, 'maxlng': -106.471163, 'minlng': -106.881796, 'maxlat': 35.218203
+
+	if abq_bbox.minlng < p.lng < abq_bbox.maxlng and
+     abq_bbox.maxlat < p.lat < abq_bbox.maxlat
+		return true
+
+################################################################################
+
 updateUs = (e) ->
 	console.log('Found location ' + e.latlng)
 
+	if not checkInAbq(e.latlng)
+		window.alert("You don't appear to be in Albuquerque. For testing, we'll place you in downtown Albuquerque, and turn off updating.")
+		window.map.stopLocate()
+		# Place us in downtown ABQ
+		pos = new L.LatLng(35.08411, -106.65098)
+	else
+		pos = e.latlng
+
 	# Fetch closest stops
-	params = lat: e.latlng.lat, lon: e.latlng.lng
+	params = lat: pos.lat, lon: pos.lng
 	$.ajax(
 		url: 'http://blitzforge.com/stops.php'
 		dataType: 'json'
@@ -152,12 +169,12 @@ updateUs = (e) ->
 	markers = window.markers
 
 	# Recenter zoom and map
-	window.map.setView(e.latlng, 16)
+	window.map.setView(pos, 16)
 
 	# If marker has been created already, update position
 	if markers['us']?
 		m = window.markers['us']
-		m.setLatLng(e.latlng)
+		m.setLatLng(pos)
 	# Create marker
 	else
 		nyandog_icon = L.Icon.extend(
@@ -168,7 +185,7 @@ updateUs = (e) ->
 			iconUrl: 'marker-icon-red.png'
 		)
 		m = new L.Marker(
-			e.latlng
+			pos
 			icon: new me_icon
 		)
 		map.addLayer(m)

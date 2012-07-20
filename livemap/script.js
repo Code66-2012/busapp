@@ -1,5 +1,5 @@
 (function() {
-  var fetchBusLocations, processNewJson, updateStops, updateUs;
+  var checkInAbq, fetchBusLocations, processNewJson, updateStops, updateUs;
 
   $(document).ready(function() {
     var abq, map, mapquest, mapquestUrl, mapquest_attribution, subDomains;
@@ -121,12 +121,32 @@
     return _results;
   };
 
+  checkInAbq = function(p) {
+    var abq_bbox, _ref, _ref2;
+    abq_bbox = {
+      'minlat': 34.947155,
+      'maxlng': -106.471163,
+      'minlng': -106.881796,
+      'maxlat': 35.218203
+    };
+    if ((abq_bbox.minlng < (_ref = p.lng) && _ref < abq_bbox.maxlng) && (abq_bbox.maxlat < (_ref2 = p.lat) && _ref2 < abq_bbox.maxlat)) {
+      return true;
+    }
+  };
+
   updateUs = function(e) {
-    var m, markers, me_icon, nyandog_icon, params;
+    var m, markers, me_icon, nyandog_icon, params, pos;
     console.log('Found location ' + e.latlng);
+    if (!checkInAbq(e.latlng)) {
+      window.alert("You don't appear to be in Albuquerque. For testing, we'll place you in downtown Albuquerque, and turn off updating.");
+      window.map.stopLocate();
+      pos = new L.LatLng(35.08411, -106.65098);
+    } else {
+      pos = e.latlng;
+    }
     params = {
-      lat: e.latlng.lat,
-      lon: e.latlng.lng
+      lat: pos.lat,
+      lon: pos.lng
     };
     $.ajax({
       url: 'http://blitzforge.com/stops.php',
@@ -135,10 +155,10 @@
       success: updateStops
     });
     markers = window.markers;
-    window.map.setView(e.latlng, 16);
+    window.map.setView(pos, 16);
     if (markers['us'] != null) {
       m = window.markers['us'];
-      return m.setLatLng(e.latlng);
+      return m.setLatLng(pos);
     } else {
       nyandog_icon = L.Icon.extend({
         iconUrl: 'nyan-dog.png',
@@ -147,7 +167,7 @@
       me_icon = L.Icon.extend({
         iconUrl: 'marker-icon-red.png'
       });
-      m = new L.Marker(e.latlng, {
+      m = new L.Marker(pos, {
         icon: new me_icon
       });
       map.addLayer(m);
