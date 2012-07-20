@@ -42,7 +42,7 @@ python mysql-import-stops.py
 python mysql-import.py
 </code>
 
-2. Also in screen, run:
+2. Either configure to run in a WSGI container, or also in screen, run:
 
 <code>
 python memcache-web-server.py
