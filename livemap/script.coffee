@@ -28,7 +28,7 @@ $(document).ready ->
 
 fetchBusLocations = () ->
 	$.getJSON(
-		'http://blitzforge.com/nyan'
+		'http://blitzforge.com/rt'
 		processNewJson
 	)
 	window.setTimeout(fetchBusLocations, 30*1000)

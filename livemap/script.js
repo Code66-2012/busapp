@@ -32,7 +32,7 @@
   });
 
   fetchBusLocations = function() {
-    $.getJSON('http://blitzforge.com/nyan', processNewJson);
+    $.getJSON('http://blitzforge.com/rt', processNewJson);
     return window.setTimeout(fetchBusLocations, 30 * 1000);
   };
 
