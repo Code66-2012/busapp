@@ -11,6 +11,7 @@ mc = memcache.Client(['127.0.0.1:11211'], debug=0)
 def get():
     response.content_type = 'application/json; charset=utf-8'
     response.set_header('Access-Control-Allow-Origin', '*')
+    response.set_header('Cache-Control', 'max-age=30')
     return mc.get('latest')
 
 # For running within a WSGI container
