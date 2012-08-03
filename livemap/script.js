@@ -71,56 +71,54 @@
   updateStops = function(json) {
     var item, m, map, stop_icon, stop_id, stop_ids_created, stop_location, _i, _len, _results;
     map = window.map;
+    stop_icon = L.icon({
+      iconUrl: 'marker-icon-purple.png'
+    });
     _results = [];
     for (_i = 0, _len = json.length; _i < _len; _i++) {
       item = json[_i];
       stop_id = item.stopID;
       stop_location = new L.LatLng(parseFloat(item.lat), parseFloat(item.lon));
       stop_ids_created = [];
-      stop_icon = L.Icon.extend({
-        options: {
-          iconUrl: 'marker-icon-purple.png'
-        }
-      });
       if (markers['stop' + stop_id] != null) {
         continue;
       } else {
         m = new L.Marker(stop_location, {
-          icon: new stop_icon
+          icon: stop_icon
         });
-        m.stop_id = stop_id;
-        m.on('click', function(e) {
-          var params,
-            _this = this;
-          params = {
-            stop_id: this.stop_id
-          };
-          return $.ajax({
-            url: 'http://blitzforge.com/distance.php',
-            dataType: 'json',
-            data: params,
-            success: function(json) {
-              var bus, busItem, html, info, route;
-              console.log(json);
-              html = "<h2>Stop " + _this.stop_id + "</h2>";
-              for (route in json) {
-                busItem = json[route];
-                html = html + ("<div><h3>Route " + route + "</h3><ul>");
-                for (bus in busItem) {
-                  info = busItem[bus];
-                  html = html + ("<li>Bus " + bus + " in ~" + info.time + " min</li>");
-                }
-                html = html + "</ul></div>";
-              }
-              console.log(html);
-              return _this.bindPopup(html).openPopup();
-            }
-          });
-        });
-        map.addLayer(m);
-        markers['stop' + stop_id] = m;
-        _results.push(stop_ids_created.push(stop_id));
       }
+      m.stop_id = stop_id;
+      m.on('click', function(e) {
+        var params,
+          _this = this;
+        params = {
+          stop_id: this.stop_id
+        };
+        return $.ajax({
+          url: 'http://blitzforge.com/distance.php',
+          dataType: 'json',
+          data: params,
+          success: function(json) {
+            var bus, busItem, html, info, route;
+            console.log(json);
+            html = "<h2>Stop " + _this.stop_id + "</h2>";
+            for (route in json) {
+              busItem = json[route];
+              html = html + ("<div><h3>Route " + route + "</h3><ul>");
+              for (bus in busItem) {
+                info = busItem[bus];
+                html = html + ("<li>Bus " + bus + " in ~" + info.time + " min</li>");
+              }
+              html = html + "</ul></div>";
+            }
+            console.log(html);
+            return _this.bindPopup(html).openPopup();
+          }
+        });
+      });
+      map.addLayer(m);
+      markers['stop' + stop_id] = m;
+      _results.push(stop_ids_created.push(stop_id));
     }
     return _results;
   };
@@ -170,13 +168,11 @@
           iconSize: new L.Point(77, 22)
         }
       });
-      me_icon = L.Icon.extend({
-        options: {
-          iconUrl: 'marker-icon-red.png'
-        }
+      me_icon = L.icon({
+        iconUrl: 'marker-icon-red.png'
       });
       m = new L.Marker(pos, {
-        icon: new me_icon
+        icon: me_icon
       });
       map.addLayer(m);
       return markers['us'] = m;

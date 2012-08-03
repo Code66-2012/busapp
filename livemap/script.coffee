@@ -84,15 +84,15 @@ processNewJson = (json) ->
 updateStops = (json) ->
 	map = window.map
 
+	stop_icon = L.icon(
+		iconUrl: 'marker-icon-purple.png'
+	)
+
 	for item in json
 		stop_id = item.stopID
 		stop_location = new L.LatLng(parseFloat(item.lat), parseFloat(item.lon))
 		stop_ids_created = []
 
-		stop_icon = L.Icon.extend(
-			options:
-				iconUrl: 'marker-icon-purple.png'
-		)
 
 		# If the stop is already on the map, ignore
 		if markers['stop' + stop_id]?
@@ -102,12 +102,12 @@ updateStops = (json) ->
 		else
 			m = new L.Marker(
 				stop_location
-				icon: new stop_icon
+				icon: stop_icon
 			)
 
-			m.stop_id = stop_id
+		m.stop_id = stop_id
 
-			m.on 'click', (e) ->
+		m.on 'click', (e) ->
 				params = stop_id: this.stop_id
 				$.ajax(
 					url: 'http://blitzforge.com/distance.php'
@@ -184,13 +184,12 @@ updateUs = (e) ->
 				iconUrl: 'nyan-dog.png'
 				iconSize: new L.Point(77, 22)
 		)
-		me_icon = L.Icon.extend(
-			options:
-				iconUrl: 'marker-icon-red.png'
+		me_icon = L.icon(
+			iconUrl: 'marker-icon-red.png'
 		)
 		m = new L.Marker(
 			pos
-			icon: new me_icon
+			icon: me_icon
 		)
 		map.addLayer(m)
 		markers['us'] = m
