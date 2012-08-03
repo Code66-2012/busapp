@@ -37,8 +37,9 @@ fetchBusLocations = () ->
 
 processNewJson = (json) ->
 	nyanbus = L.Icon.extend(
-		iconUrl: 'nyan-catbus-trans-cropped.gif'
-		iconSize: new L.Point(57, 21)
+		options:
+			iconUrl: 'nyan-catbus-trans-cropped.gif'
+			iconSize: new L.Point(57, 21)
 	)
 
 	markers = window.markers
@@ -89,7 +90,8 @@ updateStops = (json) ->
 		stop_ids_created = []
 
 		stop_icon = L.Icon.extend(
-			iconUrl: 'marker-icon-purple.png'
+			options:
+				iconUrl: 'marker-icon-purple.png'
 		)
 
 		# If the stop is already on the map, ignore
@@ -178,11 +180,13 @@ updateUs = (e) ->
 	# Create marker
 	else
 		nyandog_icon = L.Icon.extend(
-			iconUrl: 'nyan-dog.png'
-			iconSize: new L.Point(77, 22)
+			options:
+				iconUrl: 'nyan-dog.png'
+				iconSize: new L.Point(77, 22)
 		)
 		me_icon = L.Icon.extend(
-			iconUrl: 'marker-icon-red.png'
+			options:
+				iconUrl: 'marker-icon-red.png'
 		)
 		m = new L.Marker(
 			pos

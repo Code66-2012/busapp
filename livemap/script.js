@@ -39,8 +39,10 @@
   processNewJson = function(json) {
     var bus_id, bus_ids_created, bus_ids_deleted, bus_ids_updated, bus_location, bus_marker, item, map, markers, nyanbus, _i, _len;
     nyanbus = L.Icon.extend({
-      iconUrl: 'nyan-catbus-trans-cropped.gif',
-      iconSize: new L.Point(57, 21)
+      options: {
+        iconUrl: 'nyan-catbus-trans-cropped.gif',
+        iconSize: new L.Point(57, 21)
+      }
     });
     markers = window.markers;
     map = window.map;
@@ -76,7 +78,9 @@
       stop_location = new L.LatLng(parseFloat(item.lat), parseFloat(item.lon));
       stop_ids_created = [];
       stop_icon = L.Icon.extend({
-        iconUrl: 'marker-icon-purple.png'
+        options: {
+          iconUrl: 'marker-icon-purple.png'
+        }
       });
       if (markers['stop' + stop_id] != null) {
         continue;
@@ -161,11 +165,15 @@
       return m.setLatLng(pos);
     } else {
       nyandog_icon = L.Icon.extend({
-        iconUrl: 'nyan-dog.png',
-        iconSize: new L.Point(77, 22)
+        options: {
+          iconUrl: 'nyan-dog.png',
+          iconSize: new L.Point(77, 22)
+        }
       });
       me_icon = L.Icon.extend({
-        iconUrl: 'marker-icon-red.png'
+        options: {
+          iconUrl: 'marker-icon-red.png'
+        }
       });
       m = new L.Marker(pos, {
         icon: new me_icon
