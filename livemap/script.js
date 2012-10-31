@@ -33,7 +33,7 @@
   });
 
   fetchBusLocations = function() {
-    $.getJSON('http://blitzforge.com/rt', processNewJson);
+    $.getJSON('/rt', processNewJson);
     return window.setTimeout(fetchBusLocations, 30 * 1000);
   };
 
@@ -96,7 +96,7 @@
           stop_id: this.stop_id
         };
         return $.ajax({
-          url: 'http://blitzforge.com/distance.php',
+          url: '/distance.php',
           dataType: 'json',
           data: params,
           success: function(json) {
@@ -152,7 +152,7 @@
       lon: pos.lng
     };
     $.ajax({
-      url: 'http://blitzforge.com/stops.php',
+      url: '/stops.php',
       dataType: 'json',
       data: params,
       success: updateStops

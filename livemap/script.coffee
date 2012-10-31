@@ -28,7 +28,7 @@ $(document).ready ->
 
 fetchBusLocations = () ->
 	$.getJSON(
-		'http://blitzforge.com/rt'
+		'/rt'
 		processNewJson
 	)
 	window.setTimeout(fetchBusLocations, 30*1000)
@@ -110,7 +110,7 @@ updateStops = (json) ->
 		m.on 'click', (e) ->
 				params = stop_id: this.stop_id
 				$.ajax(
-					url: 'http://blitzforge.com/distance.php'
+					url: '/distance.php'
 					dataType: 'json'
 					data: params
 					success: (json) =>
@@ -162,7 +162,7 @@ updateUs = (e) ->
 	# Fetch closest stops
 	params = lat: pos.lat, lon: pos.lng
 	$.ajax(
-		url: 'http://blitzforge.com/stops.php'
+		url: '/stops.php'
 		dataType: 'json'
 		data : params
 		success: updateStops
