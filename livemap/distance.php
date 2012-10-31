@@ -1,17 +1,15 @@
 <?php
-
+if ($included != 1){
 header('Access-Control-Allow-Origin');
 header('Content-type: application/json');
 header('Access-Control-Allow-Origin: *');
-
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+}
 
 mysql_connect('localhost','root','');
 mysql_select_db('abqride');
-
-$stop_id = mysql_real_escape_string($_REQUEST['stop_id']);
-
+if (!isset($stop_id)){
+	$stop_id = mysql_real_escape_string($_REQUEST['stop_id']);
+}
 function find_dist($lat,$lon,$new_shape=true){
 
 	global $route_id,$stop_id,$shape_id;
@@ -90,7 +88,7 @@ while ($row = mysql_fetch_array($route_find)){
 	
 	//echo "<p>Route ".$route_short_id."</p>";
 	
-	$sql = "SELECT *,max(id),max(date) FROM code66.locations WHERE routeID = ".$route_short_id." AND date >= DATE_SUB(now(), INTERVAL 10 MINUTE) GROUP BY busID";
+	$sql = "SELECT *,max(id),max(date) FROM code66.locations WHERE routeID = ".$route_short_id." AND date >= DATE_SUB(now(), INTERVAL 370 MINUTE) GROUP BY busID";
 	$bus_find = mysql_query($sql);
 	$busses = array();
 	while ($row = mysql_fetch_array($bus_find)){
@@ -134,6 +132,8 @@ while ($row = mysql_fetch_array($route_find)){
 	//}
 }
 
-echo json_encode($routes);
+if ($included != 1){
+	echo json_encode($routes);
+}
 
 ?>

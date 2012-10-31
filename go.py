@@ -164,8 +164,8 @@ def go(raw_document):
         r['speed'] = float(speed)
 
         # Message Time
-        msg_time = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Msg Time"]/following-sibling::*', namespaces=namespaces)[0].text
-        r['msg_time_raw'] = msg_time
+        msg_time = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Msg Time"]/following-sibling::*', namespaces=namespaces)[0].text  
+	r['msg_time_raw'] = msg_time
         # bug here: need to make sure for times the previous night, we're not setting date in the future
         now = datetime.datetime.now(tz=dateutil.tz.gettz('US/Mountain'))
         now = now.replace(hour=0, minute=0, second=0, microsecond=0)
