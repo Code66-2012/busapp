@@ -36,7 +36,7 @@ fetchBusLocations = () ->
 ################################################################################
 
 processNewJson = (json) ->
-	nyanbus = L.Icon.extend(
+	nyanbus = L.Icon.Default.extend(
 		options:
 			iconUrl: 'nyan-catbus-trans-cropped.gif'
 			iconSize: new L.Point(57, 21)
@@ -84,7 +84,7 @@ processNewJson = (json) ->
 updateStops = (json) ->
 	map = window.map
 
-	stop_icon = L.icon(
+	stop_icon = L.Icon.Default.extend(
 		iconUrl: 'marker-icon-purple.png'
 	)
 
@@ -102,7 +102,7 @@ updateStops = (json) ->
 		else
 			m = new L.Marker(
 				stop_location
-				icon: stop_icon
+				icon: new stop_icon
 			)
 
 		m.stop_id = stop_id
@@ -179,17 +179,17 @@ updateUs = (e) ->
 		m.setLatLng(pos)
 	# Create marker
 	else
-		nyandog_icon = L.Icon.extend(
+		nyandog_icon = L.Icon.Default.extend(
 			options:
 				iconUrl: 'nyan-dog.png'
 				iconSize: new L.Point(77, 22)
 		)
-		me_icon = L.icon(
+		me_icon = L.Icon.Default.extend(
 			iconUrl: 'marker-icon-red.png'
 		)
 		m = new L.Marker(
 			pos
-			icon: me_icon
+			icon: new me_icon
 		)
 		map.addLayer(m)
 		markers['us'] = m
