@@ -88,7 +88,7 @@ while ($row = mysql_fetch_array($route_find)){
 	
 	//echo "<p>Route ".$route_short_id."</p>";
 	
-	$sql = "SELECT *,max(id),max(date) FROM code66.locations WHERE routeID = ".$route_short_id." AND date >= DATE_SUB(now(), INTERVAL 370 MINUTE) GROUP BY busID";
+	$sql = "SELECT *,max(id),max(date) FROM code66.locations WHERE routeID = ".$route_short_id." AND date >= DATE_SUB(now(), INTERVAL 430 MINUTE) GROUP BY busID";
 	$bus_find = mysql_query($sql);
 	$busses = array();
 	while ($row = mysql_fetch_array($bus_find)){
