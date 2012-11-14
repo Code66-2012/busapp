@@ -111,12 +111,12 @@ def get_stop_id(street):
 
     #mc = memcache.Client(['127.0.0.1:11211'], debug=0)
 
-    if not streets:
+    if not street:
         return
     #stops = mc.get('latest')
     q = """SELECT stopID FROM stops WHERE name = '%s'""" % (street)
     cur.execute(q)
-    stopID = cur.fetchone()
+    stopID = cur.fetchall()
     return stopID
 
 def go(raw_document):
@@ -153,10 +153,10 @@ def go(raw_document):
             # how and why did we get here? bus is operating, but no next stop?
             continue
         next_stop = next_stop[0].text
-        next_stop = re.match('(Next stop is )?(.*) @(.*) scheduled', next_stop)
-        #if next_stop:
-        #    next_stop = next_stop.groups()
-        #    next_stop = next_stop[-2:]
+        next_stop = re.match('(Next stop is )?(.*) scheduled', next_stop)
+        if next_stop:
+            next_stop = next_stop.groups()
+            next_stop = next_stop[1]
         #    next_stop = [i.strip() for i in next_stop]
         next_stop_id = get_stop_id(next_stop)
         r['next_stop'] = {'stopID': next_stop_id, 'name':next_stop}

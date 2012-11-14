@@ -12,7 +12,7 @@ def locate(busses):
 	cur = conn.cursor()
 	
 	for bus in busses:
-		print bus['next_stop']['streets']
+		print bus['next_stop']['name']
 		print bus['next_stop']['stopID']
 		
 
