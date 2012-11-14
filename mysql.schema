@@ -41,12 +41,10 @@ CREATE TABLE IF NOT EXISTS `locations` (
 
 CREATE TABLE IF NOT EXISTS `stops` (
   `stopID` int(11) NOT NULL,
-  `routes` varchar(20) NOT NULL,
   `lat` float NOT NULL,
   `lon` float NOT NULL,
-  `street` text NOT NULL,
-  `intersection` text NOT NULL,
-  `direction` varchar(20) NOT NULL,
+  `name` text NOT NULL,
+  `serves` text NOT NULL,
   PRIMARY KEY (`stopID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 

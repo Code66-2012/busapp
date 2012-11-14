@@ -52,14 +52,14 @@ def live():
 def get_stops():
     session = requests.session(headers=headers)
 
-    stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
+    stops = session.get('http://data.cabq.gov/transit/realtime/busstops/busstops.kml')
     raw_stops = stops.content
 
-    raw_stops = zipfile.ZipFile(StringIO(raw_stops), 'r')
-    raw_stops = raw_stops.open('doc.kml').read()
-    raw_stops = raw_stops.replace('http://earth.google.com/kml/2.2', namespaces['kml'])
-    raw_stops = raw_stops.replace('<![CDATA[', '')
-    raw_stops = raw_stops.replace(']]>', '')
+    #raw_stops = zipfile.ZipFile(StringIO(raw_stops), 'r')
+    #raw_stops = raw_stops.open('doc.kml').read()
+    #raw_stops = raw_stops.replace('http://earth.google.com/kml/2.2', namespaces['kml'])
+    #raw_stops = raw_stops.replace('<![CDATA[', '')
+    #raw_stops = raw_stops.replace(']]>', '')
     raw_stops = raw_stops.decode('iso-8859-1')
     raw_stops = raw_stops.encode('utf-8')
 
@@ -70,8 +70,8 @@ def get_stops():
         r = {}
 
         #stop_id
-        stop_routes = stop.xpath('kml:name', namespaces=namespaces)[0].text
-        r['routes'] = stop_routes
+        #stop_routes = stop.xpath('kml:name', namespaces=namespaces)[0].text
+        #r['routes'] = stop_routes
 
         stop_coords = stop.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
         stop_coords = stop_coords.split(',')
@@ -83,19 +83,23 @@ def get_stops():
         # change to description scope
         #stop = stop.xpath('kml:description//kml:table', namespaces=namespaces)
 
-        stop_id = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Stop ID"]/following-sibling::*', namespaces=namespaces)[0].text
+        stop_id = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="ID"]/following-sibling::*', namespaces=namespaces)[0].text
         if stop_id == '0':
             continue
         r['id'] = stop_id
-
-        stop_street = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Street"]/following-sibling::*', namespaces=namespaces)[0].text
-        r['street'] = stop_street
+        stop_name = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Name"]/following-sibling::*', namespaces=namespaces)[0].text
+        r['name'] = stop_name
+        #stop_street = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Street"]/following-sibling::*', namespaces=namespaces)[0].text
+        #r['street'] = stop_street
         #print stop_street
-        stop_intersection = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Nearest Intersection"]/following-sibling::*', namespaces=namespaces)[0].text
-        r['intersection'] = stop_intersection
-
-        stop_direction = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Direction"]/following-sibling::*', namespaces=namespaces)[0].text
-        r['direction'] = stop_direction
+        #stop_intersection = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Nearest Intersection"]/following-sibling::*', namespaces=namespaces)[0].text
+        #r['intersection'] = stop_intersection
+		
+        stop_serves = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Serving"]/following-sibling::*', namespaces=namespaces)[0].text
+        r['serves'] = stop_serves
+		
+        #stop_direction = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Direction"]/following-sibling::*', namespaces=namespaces)[0].text
+        #r['direction'] = stop_direction
 
         stop_elements_output.append(r)
 

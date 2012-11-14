@@ -26,20 +26,16 @@ if __name__ == '__main__':
         row['lon'] = row['coords']['lon']
         q = """insert into stops (
                     stopID,
-                    routes,
                     lat,
                     lon,
-                    street,
-                    intersection,
-                    direction
+                    name,
+					serves
                 ) values (
                     %(id)s,
-                    '%(routes)s',
                     %(lat)s,
                     %(lon)s,
-                    '%(street)s',
-                    '%(intersection)s',
-                    '%(direction)s')
+                    '%(name)s',
+                    '%(serves)s')
                 """ % row
         #print q
         cur.execute(q)
