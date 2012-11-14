@@ -105,7 +105,7 @@ def get_stops():
 
     return stop_elements_output
 
-def get_stop_id(streets):
+def get_stop_id(street):
     conn = MySQLdb.connect('localhost', user='root', db='code66')
     cur = conn.cursor()
 
@@ -114,9 +114,7 @@ def get_stop_id(streets):
     if not streets:
         return
     #stops = mc.get('latest')
-    street = streets[0]
-    intersection = streets[1]
-    q = """SELECT stopID FROM stops WHERE street = '%s' AND intersection = '%s'""" % (street, intersection)
+    q = """SELECT stopID FROM stops WHERE name = '%s'""" % (street)
     cur.execute(q)
     stopID = cur.fetchone()
     return stopID
@@ -156,12 +154,12 @@ def go(raw_document):
             continue
         next_stop = next_stop[0].text
         next_stop = re.match('(Next stop is )?(.*) @(.*) scheduled', next_stop)
-        if next_stop:
-            next_stop = next_stop.groups()
-            next_stop = next_stop[-2:]
-            next_stop = [i.strip() for i in next_stop]
+        #if next_stop:
+        #    next_stop = next_stop.groups()
+        #    next_stop = next_stop[-2:]
+        #    next_stop = [i.strip() for i in next_stop]
         next_stop_id = get_stop_id(next_stop)
-        r['next_stop'] = {'stopID': next_stop_id, 'streets':next_stop}
+        r['next_stop'] = {'stopID': next_stop_id, 'name':next_stop}
 
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text
