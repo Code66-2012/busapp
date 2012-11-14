@@ -29,15 +29,15 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `locations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` datetime NOT NULL,
-  `date_w3cdtf` varchar(255) NOT NULL,
-  `routeID` int(11) NOT NULL,
-  `busID` int(11) NOT NULL,
+  `date_w3cdtf` CHAR(25) NOT NULL,
+  `routeID` SMALLINT(4) UNSIGNED NOT NULL,
+  `busID` SMALLINT(4) UNSIGNED NOT NULL,
   `lat` float NOT NULL,
   `lon` float NOT NULL,
   `speed` float NOT NULL,
-  `heading` int(11) NOT NULL,
+  `heading` SMALLINT(3) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+);
 
 CREATE TABLE IF NOT EXISTS `stops` (
   `stopID` int(11) NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `stops` (
   `name` text NOT NULL,
   `serves` text NOT NULL,
   PRIMARY KEY (`stopID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
