@@ -113,7 +113,8 @@ def get_stop_id(streets):
     street = streets[0]
     intersection = streets[1]
     q = """SELECT stopID FROM stops WHERE street = '%s' AND intersection = '%s'""" % (street, intersection)
-    stopID = cur.execute(q)
+    cur.execute(q)
+    stopID = cur.fetchone()
     return stopID
 
 def go(raw_document):
