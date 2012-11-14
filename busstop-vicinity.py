@@ -14,7 +14,9 @@ def locate(busses):
 	for bus in busses:
 		print bus['next_stop']['name']
 		print bus['next_stop']['stopID']
-		
+		#print bus['route_id']
+		#print ":"		
+
 
 if __name__ == '__main__':
 	data = go.go(go.live())
