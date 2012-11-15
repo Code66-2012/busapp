@@ -114,7 +114,7 @@ def get_stop_id(street, route):
     if not street:
         return
     #stops = mc.get('latest')
-    q = """SELECT stopID FROM stops WHERE name = '%s' AND serves LIKE '%%%s%%'""" % (street,route)
+    q = """SELECT stopID FROM stops WHERE name = '%s' """ % (street)
     cur.execute(q)
     stopID = cur.fetchall()
     return stopID
@@ -156,11 +156,11 @@ def go(raw_document):
         next_stop = re.match('(Next stop is )?(.+) scheduled at (\d\d?:\d\d\s[AP]M)', next_stop)
         if next_stop:
             next_stop = next_stop.groups()
-            next_stop = next_stop[1]
+            next_stop_name = next_stop[1]
             stop_time = next_stop[2]
         #    next_stop = [i.strip() for i in next_stop]
-        next_stop_id = get_stop_id(next_stop,r['route_id'])
-        r['next_stop'] = {'stopID': next_stop_id, 'name':next_stop, 'time':stop_time}
+        next_stop_id = get_stop_id(next_stop_name,r['route_id'])
+        r['next_stop'] = {'stopID': next_stop_id, 'name':next_stop_name, 'time':stop_time}
 
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text

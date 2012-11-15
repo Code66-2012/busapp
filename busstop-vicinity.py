@@ -14,8 +14,8 @@ def locate(busses):
 	for bus in busses:
 		print bus['next_stop']['name']
 		print bus['next_stop']['stopID']
-		#print bus['route_id']
-		#print ":"		
+		print bus['next_stop']['time']
+		print bus['route_id']		
 
 
 if __name__ == '__main__':
