@@ -105,7 +105,7 @@ def get_stops():
 
     return stop_elements_output
 
-def get_stop_id(street, route):
+def get_stop_id(street, time):
     conn = MySQLdb.connect('localhost', user='root', db='code66')
     cur = conn.cursor()
 
@@ -114,7 +114,7 @@ def get_stop_id(street, route):
     if not street:
         return
     #stops = mc.get('latest')
-    q = """SELECT stopID FROM stops WHERE name = '%s' """ % (street)
+    q = """SELECT * FROM  `trip_map` WHERE  `arrival_time` LIKE  '%s%%' AND  `active_wkd` =1 AND stop_code IN (SELECT stopID FROM stops WHERE name = '%s') """ % (time, street)
     cur.execute(q)
     stopID = cur.fetchall()
     return stopID
@@ -157,9 +157,9 @@ def go(raw_document):
         if next_stop:
             next_stop = next_stop.groups()
             next_stop_name = next_stop[1]
-            stop_time = next_stop[2]
+            stop_time = time.strftime('%H:%M',time.strptime(next_stop[2],'%I:%M %p'))
         #    next_stop = [i.strip() for i in next_stop]
-        next_stop_id = get_stop_id(next_stop_name,r['route_id'])
+        next_stop_id = get_stop_id(next_stop_name,stop_time)
         r['next_stop'] = {'stopID': next_stop_id, 'name':next_stop_name, 'time':stop_time}
 
         # Speed

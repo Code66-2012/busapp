@@ -13,7 +13,7 @@ def locate(busses):
 	
 	for bus in busses:
 		print bus['next_stop']['name']
-		print bus['next_stop']['stopID']
+		print [int(x[0]) for x in bus['next_stop']['stopID']]
 		print bus['next_stop']['time']
 		print bus['route_id']		
 
