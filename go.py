@@ -105,7 +105,7 @@ def get_stops():
 
     return stop_elements_output
 
-def get_stop_id(street, time):
+def get_trip_id(street, time, route):
     conn = MySQLdb.connect('localhost', user='root', db='code66')
     cur = conn.cursor()
 
@@ -114,10 +114,22 @@ def get_stop_id(street, time):
     if not street:
         return
     #stops = mc.get('latest')
-    q = """SELECT * FROM  `trip_map` WHERE  `arrival_time` LIKE  '%s%%' AND  `active_wkd` =1 AND stop_code IN (SELECT stopID FROM stops WHERE name = '%s') """ % (time, street)
+    dotw = datetime.datetime.utcnow() + datetime.timedelta(hours = -9)
+    dotw = dotw.weekday()
+    schedule = "wkd"
+    if dotw == 6:
+        schedule = "sun"
+    if dotw == 5:
+        schedule = "sat"
+
+    q = """SELECT DISTINCT trip_id FROM `trip_map` WHERE `active_%s` = 1 AND `arrival_time` LIKE '%s%%' AND `route` =%s AND stop_code IN (SELECT stopID FROM stops WHERE name = '%s') """ % (schedule, time, route, street)
     cur.execute(q)
-    stopID = cur.fetchall()
-    return stopID
+    
+    tripID = [int(x[0]) for x in cur.fetchall()]
+    if len(tripID) == 1:
+    	return tripID[0]
+    else:
+        return 0
 
 def go(raw_document):
 
@@ -159,8 +171,8 @@ def go(raw_document):
             next_stop_name = next_stop[1]
             stop_time = time.strftime('%H:%M',time.strptime(next_stop[2],'%I:%M %p'))
         #    next_stop = [i.strip() for i in next_stop]
-        next_stop_id = get_stop_id(next_stop_name,stop_time)
-        r['next_stop'] = {'stopID': next_stop_id, 'name':next_stop_name, 'time':stop_time}
+        next_stop_id = get_trip_id(next_stop_name,stop_time,r['route_id'])
+        r['next_stop'] = {'tripID': next_stop_id, 'name':next_stop_name, 'time':stop_time}
 
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text
