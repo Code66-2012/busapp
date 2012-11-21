@@ -14,11 +14,10 @@ def locate(busses):
 	
 	for bus in busses:
 		if bus['next_stop']['tripID'] != 0:
-			mc.set(str(bus['next_stop']['tripID']),0,20 * 60)
-		print bus['next_stop']['name']
-		print bus['next_stop']['tripID']
-		print bus['next_stop']['time']
-		print bus['route_id']		
+			mc.set(str(bus['next_stop']['tripID']),str(bus['time_diff']),0,20 * 60)
+		#print bus['next_stop']['name']
+		print str(bus['next_stop']['tripID']) + ":" + str(bus['time_diff']) + ":" + str(bus['bus_id'])	
+		#print bus['route_id']		
 
 
 if __name__ == '__main__':

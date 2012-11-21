@@ -169,7 +169,8 @@ def go(raw_document):
         if next_stop:
             next_stop = next_stop.groups()
             next_stop_name = next_stop[1]
-            stop_time = time.strftime('%H:%M',time.strptime(next_stop[2],'%I:%M %p'))
+            scheduled_time = time.strptime(next_stop[2],'%I:%M %p')
+            stop_time = time.strftime('%H:%M',scheduled_time)
         #    next_stop = [i.strip() for i in next_stop]
         next_stop_id = get_trip_id(next_stop_name,stop_time,r['route_id'])
         r['next_stop'] = {'tripID': next_stop_id, 'name':next_stop_name, 'time':stop_time}
@@ -186,6 +187,11 @@ def go(raw_document):
         now = datetime.datetime.now(tz=dateutil.tz.gettz('US/Mountain'))
         now = now.replace(hour=0, minute=0, second=0, microsecond=0)
         msg_time = dateutil.parser.parse(msg_time, default=now)
+	time_diff_secs = time.mktime(time.strptime(r['msg_time_raw'],'%I:%M:%S %p')) - time.mktime(scheduled_time)
+        if time_diff_secs > 0:
+	    r['time_diff'] =  datetime.timedelta(seconds=time_diff_secs)
+        else:
+            r['time_diff'] =  datetime.timedelta(seconds=0)
         r['msg_time'] = msg_time.isoformat()
         r['msg_time_epoch'] = time.mktime(msg_time.timetuple())
 
