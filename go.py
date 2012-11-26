@@ -189,9 +189,9 @@ def go(raw_document):
         msg_time = dateutil.parser.parse(msg_time, default=now)
 	time_diff_secs = time.mktime(time.strptime(r['msg_time_raw'],'%I:%M:%S %p')) - time.mktime(scheduled_time)
         if time_diff_secs > 0:
-	    r['time_diff'] =  datetime.timedelta(seconds=time_diff_secs)
+	    r['time_diff'] =  time_diff_secs
         else:
-            r['time_diff'] =  datetime.timedelta(seconds=0)
+            r['time_diff'] =  0
         r['msg_time'] = msg_time.isoformat()
         r['msg_time_epoch'] = time.mktime(msg_time.timetuple())
 
