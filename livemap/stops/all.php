@@ -20,14 +20,14 @@
 	</div><!-- /header -->
 
 	<div data-role="content">
-	<ul data-role="listview">
+	<ul data-role="listview" data-filter="true">
 <?php
 mysql_connect('localhost','root','');
 if ($_REQUEST['route']){
-$sql = 'SELECT * FROM abqride.route_stop_map m,abqride.stops s WHERE m.stop_code =s.stop_code AND route = '.mysql_real_escape_string($_REQUEST['route']);
+$sql = 'SELECT * FROM abqride.route_stop_map m,abqride.stops_local s WHERE m.stop_code =s.stop_code AND route = '.mysql_real_escape_string($_REQUEST['route']);
 $result = mysql_query($sql);
 while ($row = mysql_fetch_array($result)){
-echo "<li><a data-ajax=\"false\" href='stop.php?stop=".$row['stop_code']."'>".$row['stop_name']."</a></li>";
+echo "<li><a href='stop.php?stop=".$row['stop_code']."&nocache=".time()."'>".$row['stop_name']." ".$row['direction']."</a></li>";
 }
 }else{
 $result = mysql_query('SELECT * FROM abqride.routes');

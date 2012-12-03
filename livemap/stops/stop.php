@@ -13,7 +13,7 @@
 
 <body> 
 
-<div data-role="page">
+<div data-role="page" data-dom-cache="false">
 
 	<div data-role="header">
 		<h1>Bus Stop</h1>
@@ -46,13 +46,13 @@ if($day == 0){
 
 date_default_timezone_set('America/Denver');
 
-$time = date("H:i:s",time()-360);
+$time = date("H:i:s",time()-1200);
 
 //if (!is_numeric($stop_id)){
 //	$stop_id = 4809;
 //}
 
-$sql = "SELECT `arrival_time`,`route`,`trip_id` FROM `code66`.`trip_map` WHERE `stop_code` = ".$stop_id." AND `active_".$dotw."` = '1' AND `arrival_time` > '".$time."' ORDER BY `arrival_time` ASC LIMIT 10";
+$sql = "SELECT `arrival_time`,`route`,`trip_id` FROM `code66`.`trip_map` WHERE `stop_code` = ".$stop_id." AND `active_".$dotw."` = '1' AND `arrival_time` > '".$time."' ORDER BY `arrival_time` ASC LIMIT 20";
 
 $result = mysql_query($sql);
 
@@ -64,19 +64,24 @@ $memcache->connect('localhost', 11211);
 while ($row = mysql_fetch_array($result)){
 	$seconds_late = $memcache->get($row[2]);
 	$real_time = "";
+	$unix_time = strtotime($row[0]);
+	$test_time = time() - ($unix_time);  //A measure of the time since the bus should have come (negative means it should still be coming)
 	if (is_numeric($seconds_late)){
-	if ($seconds_late == 0){
-		$real_time = "<b style='color:green;'>On Time</b>";
-	}else{
-		$minutes_late = ceil($seconds_late/60);
-		if ($minutes_late == 1){
-			$real_time = "<b style='color:#CC3300'>1 minute late</b>";
+		if ($seconds_late == 0){
+			$real_time = "<b style='color:green;'>On Time</b>";
 		}else{
-			$real_time = "<b style='color:red'>".$minutes_late." minutes late</b>";
+			$test_time -= $seconds_late;
+			$minutes_late = ceil($seconds_late/60);
+			if ($minutes_late == 1){
+				$real_time = "<b style='color:#CC3300'>1 minute late</b>";
+			}else{
+				$real_time = "<b style='color:red'>".$minutes_late." minutes late</b>";
+			}
 		}
 	}
+	if ($test_time < 120){
+		echo "<li test_time = '".$test_time."'>Rt ".$row[1].": Scheduled ".date('g:i a', $unix_time)." ".$real_time."</li>";
 	}
-	echo "<li>Rt ".$row[1].": Scheduled ".date('g:i a', strtotime($row[0]))." ".$real_time."</li>";
 }
 
 if (mysql_num_rows($result) == 0){

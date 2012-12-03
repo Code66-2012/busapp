@@ -1,52 +1,45 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
-	<head>
-		<title>Where The Bus‽ Real-time locatons of Albuquerque buses, and their ETA to your nearest stops. Created to Code 66 by Chris Hughes, Samat Jain, and Zerek Welz</title>
-		<style>
-			body {
-				margin: 0;
-			}
 
-			.leaflet-marker-icon,
-			.leaflet-marker-shadow {
-				transition: all 5s;
-				-moz-transition: all 5s;
-				-webkit-transition: all 5s;
-				-o-transition: all 5s;
-				-ms-transition: all 5s;
-			}
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Where's The Bus?, Albuquerque</title> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+	<script>
+	$(document).ready(function(){
+		navigator.geolocation.getCurrentPosition();
+	});
+	</script>
+</head> 
 
-			/* attempt to fix animation weirdness when zooming. doesn't work? */
-			.zoom-in-progress .leaflet-marker-icon,
-			.zoom-in-progress .leaflet-marker-shadow {
-				transition: all 1s;
-				-moz-transition: all 1s;
-				-webkit-transition: all 1s;
-				-o-transition: all 1s;
-				-ms-transition: all 1s;
-			}
-			
-			h3 {
-				color: white;
-				background-color: black;
-				padding: 0.25ex;
-			}
+<body> 
 
-			ul {
-				padding: 0;
-				list-style: none;
-			}
-		</style>
-		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
-		
-		<script src="http://code.jquery.com/jquery.min.js"></script>
-		<script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-	</head>
-	<body>
-		<div id="map" style="width: 100%; height: 100%; position: absolute;">&nbsp;
-		</div>
-		<script src="script.js"></script>
-	</body>
+<div data-role="page">
+
+	<div data-role="header">
+		<h1>Where's The Bus?</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	<img src="/stops/wtb_logo.png" style="display: block;margin-left: auto;margin-right: auto;padding-bottom: 30px;" />
+		<ul data-role="listview">
+			<li><a id="geolink" href="stops/near.php">Stops Near Me</a></li>
+			<li><a href="stops/all.php">Browse Stops</a></li>
+			<li><a data-ajax="false" href="map.html">Live Map</a></li>	
+			<li><a href="http://www.facebook.com/AbqWheresTheBus" >Facebook Page</a></li>		
+			<li><a href="https://twitter.com/abqwtb">Twitter Page</a></li>
+</ul>
+	
+	</div><!-- /content -->
+	
+	<div data-role="footer">
+		<h4>Albuquerque</h4>
+	</div><!-- /footer -->
+	
+</div><!-- /page -->
+
+</body>
 </html>
