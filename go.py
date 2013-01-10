@@ -122,7 +122,7 @@ def get_trip_id(street, time, route):
     if dotw == 5:
         schedule = "sat"
 
-    q = """SELECT DISTINCT trip_id FROM `trip_map` WHERE `active_%s` = 1 AND `arrival_time` LIKE '%s%%' AND `route` =%s AND stop_code IN (SELECT stopID FROM stops WHERE name = '%s') """ % (schedule, time, route, street)
+    q = """SELECT DISTINCT trip_id FROM `abqride`.`trip_map` WHERE `active_%s` = 1 AND `arrival_time` LIKE '%s%%' AND `route` =%s AND stop_code IN (SELECT stopID FROM code66.stops WHERE name = '%s') """ % (schedule, time, route, street)
     cur.execute(q)
     
     tripID = [int(x[0]) for x in cur.fetchall()]

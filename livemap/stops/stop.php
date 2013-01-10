@@ -8,7 +8,19 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
 	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
-	
+		<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-410552-12']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
+	</script>
 	</head> 
 
 <body> 
@@ -52,7 +64,7 @@ $time = date("H:i:s",time()-1200);
 //	$stop_id = 4809;
 //}
 
-$sql = "SELECT `arrival_time`,`route`,`trip_id` FROM `code66`.`trip_map` WHERE `stop_code` = ".$stop_id." AND `active_".$dotw."` = '1' AND `arrival_time` > '".$time."' ORDER BY `arrival_time` ASC LIMIT 20";
+$sql = "SELECT `arrival_time`,`route`,`trip_id` FROM `abqride`.`trip_map` WHERE `stop_code` = ".$stop_id." AND `active_".$dotw."` = 1 AND `arrival_time` > '".$time."' ORDER BY `arrival_time` ASC LIMIT 20";
 
 $result = mysql_query($sql);
 

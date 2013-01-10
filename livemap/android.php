@@ -25,7 +25,7 @@ $time = date("H:i:s",time()-120);
 //	$stop_id = 4809;
 //}
 
-$sql = "SELECT `arrival_time`,`route`,`trip_id` FROM `code66`.`trip_map` WHERE `stop_id` = ".$stop_id." AND `active_".$dotw."` = '1' AND `arrival_time` > '".$time."' ORDER BY `arrival_time` ASC LIMIT 10";
+$sql = "SELECT `arrival_time`,`route`,`trip_id` FROM `abqride`.`trip_map` WHERE `stop_id` = ".$stop_id." AND `active_".$dotw."` = '1' AND `arrival_time` > '".$time."' ORDER BY `arrival_time` ASC LIMIT 10";
 
 $result = mysql_query($sql);
 
