@@ -44,7 +44,10 @@ while ($row = mysql_fetch_array($result)){
 			$seconds_late = -1;
 		}
 		echo ";".$seconds_late;
-    }
+        }
+        if ($version > 3){
+		echo ";".$memcache->get($row[2]."_bus")." ";
+	}
 	echo "|";
 }
 

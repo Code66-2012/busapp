@@ -31,7 +31,7 @@
 		<h4>Albuquerque</h4>
 	</div><!-- /footer -->
 	
-	<script>
+	<script type="text/javascript">
 	if (navigator.geolocation) {
          navigator.geolocation.getCurrentPosition(onSuccess, onError);
     } else {

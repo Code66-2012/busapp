@@ -108,30 +108,7 @@ updateStops = (json) ->
 		m.stop_id = stop_id
 
 		m.on 'click', (e) ->
-				params = stop_id: this.stop_id
-				$.ajax(
-					url: '/distance.php'
-					dataType: 'json'
-					data: params
-					success: (json) =>
-						console.log json
-						html = "<h2>Stop #{ this.stop_id }</h2>"
-						for route, busItem of json
-							html = html + "<div><h3>Route #{ route }</h3><ul>"
-							for bus, info of busItem
-								html = html + "<li>Bus #{ bus } in ~#{ info.time } min</li>"
-							html = html + "</ul></div>"
-
-						console.log html
-							
-						this.bindPopup(html).openPopup()
-#					error: (json) =>
-#							html = "<div><h3>No buses for route #{ this.stop_id } today</h3><ul>"
-#
-#						console.log html
-#							
-#						this.bindPopup(html).openPopup()
-				)
+				this.bindPopup("<h2>"+this.stop_id+"</h2>").openPopup()
 						
 			map.addLayer(m)
 			markers['stop' + stop_id] = m
@@ -143,7 +120,7 @@ checkInAbq = (p) ->
 	abq_bbox = 'minlat': 34.947155, 'maxlng': -106.471163, 'minlng': -106.881796, 'maxlat': 35.218203
 
 	if abq_bbox.minlng < p.lng < abq_bbox.maxlng and
-     abq_bbox.maxlat < p.lat < abq_bbox.maxlat
+     abq_bbox.minlat < p.lat < abq_bbox.maxlat
 		return true
 
 ################################################################################

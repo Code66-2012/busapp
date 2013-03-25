@@ -90,32 +90,7 @@
       }
       m.stop_id = stop_id;
       m.on('click', function(e) {
-        var params,
-          _this = this;
-        params = {
-          stop_id: this.stop_id
-        };
-        return $.ajax({
-          url: '/distance.php',
-          dataType: 'json',
-          data: params,
-          success: function(json) {
-            var bus, busItem, html, info, route;
-            console.log(json);
-            html = "<h2>Stop " + _this.stop_id + "</h2>";
-            for (route in json) {
-              busItem = json[route];
-              html = html + ("<div><h3>Route " + route + "</h3><ul>");
-              for (bus in busItem) {
-                info = busItem[bus];
-                html = html + ("<li>Bus " + bus + " in ~" + info.time + " min</li>");
-              }
-              html = html + "</ul></div>";
-            }
-            console.log(html);
-            return _this.bindPopup(html).openPopup();
-          }
-        });
+		this.bindPopup("<h2>"+this.stop_id+"</h2>").openPopup();
       });
       map.addLayer(m);
       markers['stop' + stop_id] = m;
@@ -132,7 +107,7 @@
       'minlng': -106.881796,
       'maxlat': 35.218203
     };
-    if ((abq_bbox.minlng < (_ref = p.lng) && _ref < abq_bbox.maxlng) && (abq_bbox.maxlat < (_ref1 = p.lat) && _ref1 < abq_bbox.maxlat)) {
+    if ((abq_bbox.minlng < (_ref = p.lng) && _ref < abq_bbox.maxlng) && (abq_bbox.minlat < (_ref1 = p.lat) && _ref1 < abq_bbox.maxlat)) {
       return true;
     }
   };
