@@ -1,0 +1,8 @@
+user-agent: *
+disallow: /m/stops.php?*
+
+user-agent: googlebot
+disallow: /m/
+
+user-agent: googlebot-mobile
+disallow: /m/stops.php?*
