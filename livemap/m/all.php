@@ -34,7 +34,7 @@
 	<div data-role="content">
 	<ul data-role="listview" data-filter="true">
 <?php
-mysql_connect('localhost','root','');
+mysql_connect('localhost','app','6,$S{1MOL$6_"5lft6');
 if ($_REQUEST['route']){
 $sql = 'SELECT * FROM abqride.route_stop_map m,abqride.stops_local s WHERE m.stop_code =s.stop_code AND route = '.mysql_real_escape_string($_REQUEST['route']);
 $result = mysql_query($sql);

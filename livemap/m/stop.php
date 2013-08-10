@@ -43,10 +43,10 @@ header("Expires: -1");
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-
+mysql_connect('localhost','app','6,$S{1MOL$6_"5lft6');
 $stop_id = mysql_real_escape_string($_REQUEST['stop']);
 
-mysql_connect('localhost','root','');
+
 
 date_default_timezone_set('America/Anchorage');
 

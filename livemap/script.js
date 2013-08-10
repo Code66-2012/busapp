@@ -34,7 +34,7 @@
   });
 
   fetchBusLocations = function() {
-    $.getJSON('/rt', processNewJson);
+    $.getJSON('/rt.php', processNewJson);
     return window.setTimeout(fetchBusLocations, 30 * 1000);
   };
 

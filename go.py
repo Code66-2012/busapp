@@ -33,7 +33,8 @@ headers = {'user-agent': 'Code 66 hackathon'}
 namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
 
 # create persistent session, so we don't hammer ABQ's servers too much
-session = requests.session(headers=headers)
+session = requests.session()
+session.headers = headers
 
 
 @route('/')
@@ -44,13 +45,14 @@ def returnJson():
 
 def live():
 
-    d = session.get('http://data.cabq.gov/transit/realtime/introute/intallbuses.kml')
+    d = session.get('http://data.cabq.gov/transit/realtime/route/allroutes.kml')
     raw_document = d.content
 
     return raw_document
 
 def get_stops():
-    session = requests.session(headers=headers)
+    session = requests.session()
+    session.headers = headers
 
     stops = session.get('http://data.cabq.gov/transit/realtime/busstops/busstops.kml')
     raw_stops = stops.content
@@ -94,10 +96,8 @@ def get_stops():
         #print stop_street
         #stop_intersection = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Nearest Intersection"]/following-sibling::*', namespaces=namespaces)[0].text
         #r['intersection'] = stop_intersection
-		
         stop_serves = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Serving"]/following-sibling::*', namespaces=namespaces)[0].text
         r['serves'] = stop_serves
-		
         #stop_direction = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Direction"]/following-sibling::*', namespaces=namespaces)[0].text
         #r['direction'] = stop_direction
 
@@ -106,7 +106,7 @@ def get_stops():
     return stop_elements_output
 
 def get_trip_id(street, time, route):
-    conn = MySQLdb.connect('localhost', user='root', db='code66')
+    conn = MySQLdb.connect('localhost', 'app', '6,$S{1MOL$6_"5lft6')
     cur = conn.cursor()
 
     #mc = memcache.Client(['127.0.0.1:11211'], debug=0)
@@ -122,12 +122,12 @@ def get_trip_id(street, time, route):
     if dotw == 5:
         schedule = "sat"
 
-    q = """SELECT DISTINCT trip_id FROM `abqride`.`trip_map` WHERE `active_%s` = 1 AND `arrival_time` LIKE '%s%%' AND `route` =%s AND stop_code IN (SELECT stopID FROM code66.stops WHERE name = '%s') """ % (schedule, time, route, street)
+    q = """SELECT DISTINCT trip_id FROM `abqride`.`trip_map` WHERE `active_%s` = 1 AND `arrival_time` LIKE '%s%%' AND `route` =%s AND stop_code IN (SELECT stop_code FROM abqride.stops WHERE stop_name = '%s') """ % (schedule, time, route, street)
     cur.execute(q)
     
     tripID = [int(x[0]) for x in cur.fetchall()]
     if len(tripID) == 1:
-    	return tripID[0]
+        return tripID[0]
     else:
         return 0
 
@@ -145,11 +145,11 @@ def go(raw_document):
         r = {}
 
         # Bus ID
-        bus_id = bus_element.xpath('kml:name', namespaces=namespaces)[0].text
+        bus_id = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Vehicle #"]/following-sibling::*', namespaces=namespaces)[0].text
         r['bus_id'] = int(bus_id)
 
         # Route ID
-        route_id = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Route"]/following-sibling::*', namespaces=namespaces)
+        route_id = bus_element.xpath('kml:name', namespaces=namespaces)
         if not route_id:
             continue
         route_id = route_id[0].text
@@ -182,14 +182,14 @@ def go(raw_document):
 
         # Message Time
         msg_time = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Msg Time"]/following-sibling::*', namespaces=namespaces)[0].text  
-	r['msg_time_raw'] = msg_time
+        r['msg_time_raw'] = msg_time
         # bug here: need to make sure for times the previous night, we're not setting date in the future
         now = datetime.datetime.now(tz=dateutil.tz.gettz('US/Mountain'))
         now = now.replace(hour=0, minute=0, second=0, microsecond=0)
         msg_time = dateutil.parser.parse(msg_time, default=now)
-	time_diff_secs = time.mktime(time.strptime(r['msg_time_raw'],'%I:%M:%S %p')) - time.mktime(scheduled_time)
+        time_diff_secs = time.mktime(time.strptime(r['msg_time_raw'],'%I:%M:%S %p')) - time.mktime(scheduled_time)
         if time_diff_secs > 0:
-	    r['time_diff'] =  time_diff_secs
+            r['time_diff'] =  time_diff_secs
         else:
             r['time_diff'] =  0
         r['msg_time'] = msg_time.isoformat()

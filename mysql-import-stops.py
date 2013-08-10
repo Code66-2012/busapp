@@ -8,7 +8,7 @@ import memcache
 import go
 
 if __name__ == '__main__':
-    conn = MySQLdb.connect('localhost', user='root', passwd='', db='code66')
+    conn = MySQLdb.connect('localhost', user='app', passwd='6,$S{1MOL$6_"5lft6', db='code66')
     cur = conn.cursor()
 
     mc = memcache.Client(['127.0.0.1:11211'], debug=0)
@@ -19,9 +19,9 @@ if __name__ == '__main__':
     mc.set('stops', json.dumps(data))
 
     for row in data:
-        q_exists = """SELECT stopID FROM stops WHERE stopID = '%s'""" % row['id']
-        if cur.execute(q_exists) > 0:
-            continue
+        #q_exists = """SELECT stopID FROM stops WHERE stopID = '%s'""" % row['id']
+        #if cur.execute(q_exists) > 0:
+        #    continue
         row['lat'] = row['coords']['lat']
         row['lon'] = row['coords']['lon']
         q = """insert into stops (
@@ -29,7 +29,7 @@ if __name__ == '__main__':
                     lat,
                     lon,
                     name,
-					serves
+                    serves
                 ) values (
                     %(id)s,
                     %(lat)s,

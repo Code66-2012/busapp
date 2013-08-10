@@ -4,7 +4,7 @@ header("content-type: text/xml");
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 echo "<Response><Say voice =\"woman\">You entered " . $_REQUEST['Digits']. " .";
 
-mysql_connect('localhost','root','');
+mysql_connect('localhost','app','6,$S{1MOL$6_"5lft6');
 mysql_select_db('abqride');
 $stop_id = mysql_real_escape_string($_REQUEST['Digits']);
 $sql = "SELECT `stop_name` FROM `stops` WHERE `stop_code` = ".$stop_id;
