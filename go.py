@@ -54,16 +54,17 @@ def get_stops():
     session = requests.session()
     session.headers = headers
 
-    stops = session.get('http://data.cabq.gov/transit/realtime/busstops/busstops.kml')
+    stops = session.get('http://data.cabq.gov/transit/routesandstops/transitstops.kmz')
     raw_stops = stops.content
 
-    #raw_stops = zipfile.ZipFile(StringIO(raw_stops), 'r')
-    #raw_stops = raw_stops.open('doc.kml').read()
-    #raw_stops = raw_stops.replace('http://earth.google.com/kml/2.2', namespaces['kml'])
-    #raw_stops = raw_stops.replace('<![CDATA[', '')
-    #raw_stops = raw_stops.replace(']]>', '')
-    raw_stops = raw_stops.decode('iso-8859-1')
+    raw_stops = zipfile.ZipFile(StringIO(raw_stops), 'r')
+    raw_stops = raw_stops.open('doc.kml').read()
+    raw_stops = raw_stops.decode('utf-8')
+    raw_stops = raw_stops.replace('http://earth.google.com/kml/2.2', namespaces['kml'])
+    raw_stops = raw_stops.replace('<![CDATA[', '')
+    raw_stops = raw_stops.replace(']]>', '')
     raw_stops = raw_stops.encode('utf-8')
+    
 
     st = etree.fromstring(raw_stops)
     stop_elements = st.xpath('//kml:Placemark', namespaces=namespaces)
@@ -85,31 +86,35 @@ def get_stops():
         # change to description scope
         #stop = stop.xpath('kml:description//kml:table', namespaces=namespaces)
 
-        stop_id = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="ID"]/following-sibling::*', namespaces=namespaces)[0].text
+        stop_id = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Stop ID"]/following-sibling::*', namespaces=namespaces)[0].text
         if stop_id == '0':
             continue
         r['id'] = stop_id
-        stop_name = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Name"]/following-sibling::*', namespaces=namespaces)[0].text
-        r['name'] = stop_name
-        #stop_street = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Street"]/following-sibling::*', namespaces=namespaces)[0].text
+        #stop_name = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Name"]/following-sibling::*', namespaces=namespaces)[0].text
+        #r['name'] = stop_name
+        stop_street = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Street"]/following-sibling::*', namespaces=namespaces)[0].text
         #r['street'] = stop_street
         #print stop_street
-        #stop_intersection = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Nearest Intersection"]/following-sibling::*', namespaces=namespaces)[0].text
+        stop_intersection = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Nearest Intersection"]/following-sibling::*', namespaces=namespaces)[0].text
         #r['intersection'] = stop_intersection
-        stop_serves = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Serving"]/following-sibling::*', namespaces=namespaces)[0].text
-        r['serves'] = stop_serves
-        #stop_direction = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Direction"]/following-sibling::*', namespaces=namespaces)[0].text
-        #r['direction'] = stop_direction
+        #stop_serves = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Serving"]/following-sibling::*', namespaces=namespaces)[0].text
+        #r['serves'] = stop_serves
+        r['name'] = """%s , %s""" % (stop_street, stop_intersection)
+        stop_direction = stop.xpath('kml:description//kml:table/kml:tr/kml:td[text()="Direction"]/following-sibling::*', namespaces=namespaces)[0].text
+        r['direction'] = stop_direction
 
         stop_elements_output.append(r)
 
     return stop_elements_output
 
-def get_trip_id(street, time, route):
-    conn = MySQLdb.connect('localhost', 'app', '6,$S{1MOL$6_"5lft6')
-    cur = conn.cursor()
 
+
+
+def get_trip_id(street, time, route):
     #mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+
+    conn = MySQLdb.connect('localhost', 'app', '6,$S{1MOL$6_"5lft6',charset='utf8')
+    cur = conn.cursor()
 
     if not street:
         return
@@ -122,10 +127,11 @@ def get_trip_id(street, time, route):
     if dotw == 5:
         schedule = "sat"
 
-    q = """SELECT DISTINCT trip_id FROM `abqride`.`trip_map` WHERE `active_%s` = 1 AND `arrival_time` LIKE '%s%%' AND `route` =%s AND stop_code IN (SELECT stop_code FROM abqride.stops WHERE stop_name = '%s') """ % (schedule, time, route, street)
-    cur.execute(q)
+    q = u"SELECT DISTINCT trip_id FROM `abqride`.`trip_map` WHERE `active_"+schedule+"` = 1 AND `arrival_time` LIKE %s AND `route` =%s AND stop_code IN (SELECT stop_code FROM abqride.stops WHERE stop_name = %s) "
+    cur.execute(q, (time+'%',route,street))
     
     tripID = [int(x[0]) for x in cur.fetchall()]
+    
     if len(tripID) == 1:
         return tripID[0]
     else:
@@ -144,7 +150,7 @@ def go(raw_document):
     for bus_element in bus_elements:
         r = {}
 
-        # Bus ID
+        # Bus ////////////////////ID
         bus_id = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Vehicle #"]/following-sibling::*', namespaces=namespaces)[0].text
         r['bus_id'] = int(bus_id)
 
@@ -163,9 +169,10 @@ def go(raw_document):
             next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Deadhead"]/following-sibling::*', namespaces=namespaces)
         if not next_stop:
             # how and why did we get here? bus is operating, but no next stop?
+            print "No next stop?"
             continue
         next_stop = next_stop[0].text
-        next_stop = re.match('(Next stop is )?(.+) scheduled at (\d\d?:\d\d\s[AP]M)', next_stop)
+        next_stop = re.match('(Next stop is )?(.+) @ (\d\d?:\d\d\s[AP]M)', next_stop)
         if next_stop:
             next_stop = next_stop.groups()
             next_stop_name = next_stop[1]
@@ -190,6 +197,8 @@ def go(raw_document):
         time_diff_secs = time.mktime(time.strptime(r['msg_time_raw'],'%I:%M:%S %p')) - time.mktime(scheduled_time)
         if time_diff_secs > 0:
             r['time_diff'] =  time_diff_secs
+        elif time_diff_secs < -60:
+            r['time_diff'] = time_diff_secs
         else:
             r['time_diff'] =  0
         r['msg_time'] = msg_time.isoformat()
