@@ -165,6 +165,14 @@ def go(raw_document):
             continue
         r['route_id'] = int(route_id)
 
+        # Coordinates
+        coords = bus_element.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
+        coords = coords.split(',')
+        coords_out = {}
+        coords_out['lon'] = float(coords[0])
+        coords_out['lat'] = float(coords[1])
+        r['coords'] = coords_out
+
         # Next Stop
         next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Next Stop"]/following-sibling::*', namespaces=namespaces)
         if not next_stop:
@@ -184,7 +192,7 @@ def go(raw_document):
             r['next_stop'] = {'tripID': next_stop_id, 'name':next_stop_name, 'time':stop_time}
         else:
             logging.warn("No match for "+next_stop)
-            r['next_stop'] = {'tripID': 0, 'name':""}
+            continue
         
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text
@@ -207,14 +215,6 @@ def go(raw_document):
             r['time_diff'] =  0
         r['msg_time'] = msg_time.isoformat()
         r['msg_time_epoch'] = time.mktime(msg_time.timetuple())
-
-        # Coordinates
-        coords = bus_element.xpath('kml:Point/kml:coordinates', namespaces=namespaces)[0].text
-        coords = coords.split(',')
-        coords_out = {}
-        coords_out['lon'] = float(coords[0])
-        coords_out['lat'] = float(coords[1])
-        r['coords'] = coords_out
 
         # Heading
         heading = bus_element.xpath('kml:Style/kml:IconStyle/kml:heading', namespaces=namespaces)[0].text
