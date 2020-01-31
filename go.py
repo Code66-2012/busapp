@@ -171,19 +171,21 @@ def go(raw_document):
             next_stop = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[normalize-space(text())="Deadhead"]/following-sibling::*', namespaces=namespaces)
         if not next_stop:
             # how and why did we get here? bus is operating, but no next stop?
-            print "No next stop?"
+            logging.warn("No next stop?")
             continue
         next_stop = next_stop[0].text
-        next_stop = re.match('(Next stop is )?(.+) @ (\d\d?:\d\d\s[AP]M)', next_stop)
-        if next_stop:
-            next_stop = next_stop.groups()
+        next_stop_match = re.match('(Next stop is )?(.+) @ (\d\d?:\d\d\s[AP]M)', next_stop)
+        if next_stop_match:
+            next_stop = next_stop_match.groups()
             next_stop_name = next_stop[1]
             scheduled_time = time.strptime(next_stop[2],'%I:%M %p')
             stop_time = time.strftime('%H:%M',scheduled_time)
-        #    next_stop = [i.strip() for i in next_stop]
-        next_stop_id = get_trip_id(next_stop_name,stop_time,r['route_id'])
-        r['next_stop'] = {'tripID': next_stop_id, 'name':next_stop_name, 'time':stop_time}
-
+            next_stop_id = get_trip_id(next_stop_name,stop_time,r['route_id'])
+            r['next_stop'] = {'tripID': next_stop_id, 'name':next_stop_name, 'time':stop_time}
+        else:
+            logging.warn("No match for "+next_stop)
+            r['next_stop'] = {'tripID': 0, 'name':""}
+        
         # Speed
         speed = bus_element.xpath('kml:description/kml:table/kml:tr/kml:td[text()="Speed"]/following-sibling::*', namespaces=namespaces)[0].text
         speed = speed.split()[0]
