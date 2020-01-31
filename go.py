@@ -141,8 +141,6 @@ def get_trip_id(street, time, route):
 
 def go(raw_document):
 
-    logging.warn("Going")
-
     raw_document = raw_document.decode('iso-8859-1')
     raw_document = raw_document.encode('utf-8')
     #raw_document = fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time(raw_document)
