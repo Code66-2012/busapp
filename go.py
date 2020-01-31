@@ -21,6 +21,8 @@ from StringIO import StringIO
 import MySQLdb
 import memcache
 
+import logging
+
 
 def utf8_encode_callback(m):
     return unicode(m).encode()
@@ -138,6 +140,8 @@ def get_trip_id(street, time, route):
         return 0
 
 def go(raw_document):
+
+    logging.warn("Going")
 
     raw_document = raw_document.decode('iso-8859-1')
     raw_document = raw_document.encode('utf-8')

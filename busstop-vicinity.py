@@ -35,7 +35,8 @@ def locate(busses):
         mc.set(str(bus['bus_id'])+"_coords",str(bus['coords']['lat'])+":"+str(bus['coords']['lon']),180*60)
         print (str(bus['next_stop']['tripID']) + ":" + str(bus['time_diff']) + ":" + str(bus['bus_id']))
         #print bus['route_id']
-    mc.set("on_time_percent",str(float(count)/len(busses)),60*10)
+    if len(busses) > 0:
+        mc.set("on_time_percent",str(float(count)/len(busses)),60*10)
     
 if __name__ == '__main__': 
     data = go.go(go.live())
