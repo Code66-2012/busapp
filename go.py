@@ -191,7 +191,7 @@ def go(raw_document):
             next_stop_id = get_trip_id(next_stop_name,stop_time,r['route_id'])
             r['next_stop'] = {'tripID': next_stop_id, 'name':next_stop_name, 'time':stop_time}
         else:
-            logging.warn("No match for "+next_stop)
+            #logging.warn("No match for "+next_stop)
             continue
         
         # Speed
